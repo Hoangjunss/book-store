@@ -18,10 +18,12 @@ public class ProductServiceImpl implements ProductService {
     private ProductRepository productRepository;
     @Autowired
     private ProductMapper productMapper;
+    @Autowired
+    private ImageService imageService;
 
     @Override
     public ProductDTO createProduct(ProductCreateDTO productDTO) {
-        Image image=new Image();
+        Image image=imageService.saveImage(productDTO.getImage());
         Supply supply=new Supply();
         Category category=new Category();
         Product product=productMapper.conventProductCreateDTOToProduct(productDTO,category,image,supply);
