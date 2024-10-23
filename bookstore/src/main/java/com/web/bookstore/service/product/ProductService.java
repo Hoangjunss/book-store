@@ -5,7 +5,7 @@ import com.web.bookstore.dto.product.ProductDTO;
 
 public interface ProductService {
     ProductDTO createProduct(ProductCreateDTO productDTO);
-    ProductDTO updateProduct( ProductDTO productDTO);
+    ProductDTO updateProduct( ProductCreateDTO productDTO);
     void deleteProduct(Integer id);
     ProductDTO findById(Integer id);
 }

@@ -17,10 +17,10 @@ public class ProductDTO {
     private String description;
     private String author;
     private Integer page;
-    private Integer categoryId;
-    private MultipartFile image;
+    private String category;
+    private String image;
     private LocalDate datePublic;
     private String size;
-    private Integer supplyId;
+    private String supply;
     private Boolean status;
 }
