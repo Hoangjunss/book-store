@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductCreateDTO {
+    private Integer id;
     private String name;
     private String description;
     private String author;
