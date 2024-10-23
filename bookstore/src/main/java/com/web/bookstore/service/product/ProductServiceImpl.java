@@ -18,12 +18,14 @@ public class ProductServiceImpl implements ProductService {
     private ProductRepository productRepository;
     @Autowired
     private ProductMapper productMapper;
+    @Autowired
+    private CategoryService categoryService;
 
     @Override
     public ProductDTO createProduct(ProductCreateDTO productDTO) {
         Image image=new Image();
         Supply supply=new Supply();
-        Category category=new Category();
+        Category category=categoryService.findById(productDTO.getCategoryId());
         Product product=productMapper.conventProductCreateDTOToProduct(productDTO,category,image,supply);
 
         return productMapper.conventProductToProductDTO(productRepository.save(product));
@@ -35,7 +37,7 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow();
 
         // Tạo các thực thể mới hoặc lấy từ repository (nếu cần)
-        Category category = new Category();
+        Category category=categoryService.findById(productDTO.getCategoryId());
         Image image =new Image();
         Supply supply=new Supply();
 
