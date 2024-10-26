@@ -1,6 +1,6 @@
 package com.web.bookstore.controller;
 
-import com.web.bookstore.dto.product.ProductCreateDTO;
+import com.web.bookstore.dto.productDTO.productDTO.ProductCreateDTO;
 import com.web.bookstore.service.product.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

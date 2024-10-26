@@ -1,4 +1,4 @@
-package com.web.bookstore.dto.product;
+package com.web.bookstore.dto.productDTO.productDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,11 +7,12 @@ import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class ProductCreateDTO {
+@AllArgsConstructor
+public class ProductUpdateDTO {
     private Integer id;
     private String name;
     private String description;

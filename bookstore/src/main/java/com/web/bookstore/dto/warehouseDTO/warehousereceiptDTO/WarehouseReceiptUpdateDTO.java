@@ -1,8 +1,7 @@
-package com.web.bookstore.dto.warehouseDTO;
+package com.web.bookstore.dto.warehouseDTO.warehousereceiptDTO;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 
 public class WarehouseReceiptUpdateDTO {
     private Integer id;

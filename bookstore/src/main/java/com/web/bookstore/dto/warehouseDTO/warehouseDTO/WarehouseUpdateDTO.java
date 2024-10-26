@@ -1,4 +1,4 @@
-package com.web.bookstore.dto.warehouseDTO;
+package com.web.bookstore.dto.warehouseDTO.warehouseDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,17 +7,15 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class WarehouseReceiptDTO {
+public class WarehouseUpdateDTO {
     private Integer id;
-
-    private String supplyName;
+    private Integer idProduct;
     private Integer quantity;
-    private BigDecimal totalPrice;
+    private BigDecimal price;
+    private Boolean status;
     private LocalDate date;
-    private List<WarehouseReceiptDetailDTO> wareHouseReceiptDetailDTOS;
 }

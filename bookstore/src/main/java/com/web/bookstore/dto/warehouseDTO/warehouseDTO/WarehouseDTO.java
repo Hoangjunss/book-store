@@ -1,9 +1,5 @@
-package com.web.bookstore.dto.warehouseDTO;
+package com.web.bookstore.dto.warehouseDTO.warehouseDTO;
 
-import com.web.bookstore.entity.product.Product;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,11 +11,10 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class WarehouseCreateDTO {
+public class WarehouseDTO {
 
     private Integer id;
-
-    private Integer idProduct;
+    private String productName;
     private Integer quantity;
     private BigDecimal price;
     private Boolean status;

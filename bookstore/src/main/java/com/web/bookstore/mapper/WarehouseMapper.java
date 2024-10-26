@@ -1,6 +1,14 @@
 package com.web.bookstore.mapper;
 
-import com.web.bookstore.dto.warehouseDTO.*;
+import com.web.bookstore.dto.warehouseDTO.warehouseDTO.WarehouseCreateDTO;
+import com.web.bookstore.dto.warehouseDTO.warehouseDTO.WarehouseDTO;
+import com.web.bookstore.dto.warehouseDTO.warehouseDTO.WarehouseUpdateDTO;
+import com.web.bookstore.dto.warehouseDTO.warehousereceiptDTO.WareHouseReceiptCreateDTO;
+import com.web.bookstore.dto.warehouseDTO.warehousereceiptDTO.WarehouseReceiptDTO;
+import com.web.bookstore.dto.warehouseDTO.warehousereceiptDTO.WarehouseReceiptUpdateDTO;
+import com.web.bookstore.dto.warehouseDTO.warehousereceiptdetailDTO.WarehouseReceiptDetailCreateDTO;
+import com.web.bookstore.dto.warehouseDTO.warehousereceiptdetailDTO.WarehouseReceiptDetailDTO;
+import com.web.bookstore.dto.warehouseDTO.warehousereceiptdetailDTO.WarehouseReceiptDetailUpdateDTO;
 import com.web.bookstore.entity.product.Product;
 import com.web.bookstore.entity.user.Supply;
 import com.web.bookstore.entity.warehouse.Warehouse;
@@ -22,7 +30,7 @@ public class WarehouseMapper {
         warehouse.setProduct(product);
         return  warehouse;
     }
-    public Warehouse conventWarehouseDTOToWarehouse(WarehouseUpdateDTO warehouseUpdateDTO,Product product){
+    public Warehouse conventWarehouseDTOToWarehouse(WarehouseUpdateDTO warehouseUpdateDTO, Product product){
           Warehouse warehouse=mapper.map(warehouseUpdateDTO,Warehouse.class);
           warehouse.setProduct(product);
           return warehouse;
@@ -42,7 +50,7 @@ public class WarehouseMapper {
         warehouseReceipt.setSupply(supply);
         return warehouseReceipt;
     }
-    public WarehouseReceiptDTO convertWarehouseReceiptToWarehouseReceiptDTO(WarehouseReceipt warehouseReceipt,List<WarehouseReceiptDetail> warehouseReceiptDetails) {
+    public WarehouseReceiptDTO convertWarehouseReceiptToWarehouseReceiptDTO(WarehouseReceipt warehouseReceipt, List<WarehouseReceiptDetail> warehouseReceiptDetails) {
         WarehouseReceiptDTO warehouseReceiptDTO = mapper.map(warehouseReceipt, WarehouseReceiptDTO.class);
         warehouseReceiptDTO.setSupplyName(warehouseReceipt.getSupply().getName());
         List<WarehouseReceiptDetailDTO>  warehouseReceiptDetailDTOS= warehouseReceiptDetails.stream().map(this::convertWarehouseReceiptDetailToWarehouseReceiptDetailDTO).collect(Collectors.toList());
@@ -64,10 +72,5 @@ public class WarehouseMapper {
         warehouseReceiptDetailDTO.setProductName(warehouseReceiptDetail.getProduct().getName());
         return warehouseReceiptDetailDTO;
     }
-
-
-
-
-
 
 }
