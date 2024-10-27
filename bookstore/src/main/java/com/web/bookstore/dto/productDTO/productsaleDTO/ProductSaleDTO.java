@@ -15,4 +15,5 @@ public class ProductSaleDTO {
     private Product product;
     private Integer quantity;
     private Boolean status;
+    private Double price;
 }
