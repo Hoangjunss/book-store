@@ -1,7 +1,7 @@
 package com.web.bookstore.service.product;
 
-import com.web.bookstore.dto.product.ProductCreateDTO;
-import com.web.bookstore.dto.product.ProductDTO;
+import com.web.bookstore.dto.productDTO.productDTO.ProductCreateDTO;
+import com.web.bookstore.dto.productDTO.productDTO.ProductDTO;
 import com.web.bookstore.entity.product.Category;
 import com.web.bookstore.entity.product.Image;
 import com.web.bookstore.entity.product.Product;

@@ -1,4 +1,4 @@
-package com.web.bookstore.dto.warehouseDTO;
+package com.web.bookstore.dto.warehouseDTO.warehouseDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
