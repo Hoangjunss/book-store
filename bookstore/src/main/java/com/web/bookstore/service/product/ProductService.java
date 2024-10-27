@@ -1,7 +1,7 @@
 package com.web.bookstore.service.product;
 
-import com.web.bookstore.dto.product.ProductCreateDTO;
-import com.web.bookstore.dto.product.ProductDTO;
+import com.web.bookstore.dto.productDTO.productDTO.ProductCreateDTO;
+import com.web.bookstore.dto.productDTO.productDTO.ProductDTO;
 
 public interface ProductService {
     ProductDTO createProduct(ProductCreateDTO productDTO);
