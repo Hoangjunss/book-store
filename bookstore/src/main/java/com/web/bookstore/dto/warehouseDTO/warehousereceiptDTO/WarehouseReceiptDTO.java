@@ -1,5 +1,6 @@
-package com.web.bookstore.dto.warehouseDTO;
+package com.web.bookstore.dto.warehouseDTO.warehousereceiptDTO;
 
+import com.web.bookstore.dto.warehouseDTO.warehousereceiptdetailDTO.WarehouseReceiptDetailDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
