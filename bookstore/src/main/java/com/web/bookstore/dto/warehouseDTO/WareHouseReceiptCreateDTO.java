@@ -25,5 +25,6 @@ public class WareHouseReceiptCreateDTO {
     private Integer quantity;
     private BigDecimal totalPrice;
     private LocalDate date;
+    private List<WarehouseReceiptDetailCreateDTO> wareHouseReceiptDetailDTOS;
 
 }
