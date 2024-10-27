@@ -160,6 +160,7 @@ public enum Error {
         ORDERDETAIL_INVALID_QUANTITY(12103, "Invalid quantity", HttpStatus.BAD_REQUEST),
         ORDERDETAIL_INVALID_UNIT_PRICE(12104, "Invalid unit price", HttpStatus.BAD_REQUEST),
         ORDERDETAIL_INVALID_TOTAL_PRICE(12105, "Invalid total price", HttpStatus.BAD_REQUEST),
+        ORDERDETAIL_INVALID_PRODUCTSALE(12106, "Quantity Long to Quantity product sale ", HttpStatus.BAD_REQUEST),
     // Invoice-related errors
     INVOICE_NOT_FOUND(13001, "Invoice not found", HttpStatus.NOT_FOUND),
     INVOICE_ALREADY_EXISTS(13002, "Invoice already exists", HttpStatus.CONFLICT),
