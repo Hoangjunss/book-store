@@ -9,8 +9,8 @@ import java.math.BigDecimal;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class WarehouseReceiptDetailUpdateDTO {
 
     private Integer id;
