@@ -8,4 +8,5 @@ import java.util.Optional;
 
 public interface WarehouseRepository extends JpaRepository<Warehouse,Integer> {
     Optional<Warehouse> findByProduct(Product product);
+    Optional<Warehouse> findByProductId(Integer productId);
 }
