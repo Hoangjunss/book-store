@@ -1,5 +1,10 @@
 package com.web.bookstore.dto.warehouseDTO.warehousereceiptdetailDTO;
 
+import com.web.bookstore.entity.product.Product;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,8 +14,9 @@ import java.math.BigDecimal;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+
 public class WarehouseReceiptDetailUpdateDTO {
 
     private Integer id;
