@@ -14,4 +14,5 @@ public class ProductSaleUpdateDTO {
     private Integer productId;
     private Integer quantity;
     private Boolean status;
+    private Double price;
 }
