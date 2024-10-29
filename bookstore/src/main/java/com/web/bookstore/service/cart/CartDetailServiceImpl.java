@@ -6,6 +6,7 @@ import com.web.bookstore.dto.cartDTO.cartdetailDTO.CartDetailUpdateDTO;
 import com.web.bookstore.entity.cart.Cart;
 import com.web.bookstore.entity.cart.CartDetail;
 import com.web.bookstore.entity.product.ProductSale;
+import com.web.bookstore.entity.user.User;
 import com.web.bookstore.exception.CustomException;
 import com.web.bookstore.exception.Error;
 import com.web.bookstore.mapper.CartDetailMapper;
@@ -32,6 +33,9 @@ public class CartDetailServiceImpl implements CartDetailService{
 
     @Autowired
     private ProductSaleRepository productSaleRepository;
+    @Autowired
+    private CartService cartService;
+
 
     @Override
     public List<CartDetailDTO> findAllCartDetailDTOsByCart(Integer idCart) {
@@ -48,18 +52,31 @@ public class CartDetailServiceImpl implements CartDetailService{
     public CartDetailDTO createCartDetail(CartDetailCreateDTO cartDetailCreateDTO) {
         log.info("Create cart detail: {}", cartDetailCreateDTO.toString());
 
+
         ProductSale productSale = productSaleRepository.findById(cartDetailCreateDTO.getProductSaleId())
                 .orElseThrow(()-> new CustomException(Error.PRODUCTSALE_NOT_FOUND));
-
-        Cart cart = cartRepository.findById(cartDetailCreateDTO.getCartId())
-                .orElseThrow(()-> new CustomException(Error.CART_NOT_FOUND));
-
         if(cartDetailCreateDTO.getQuantity() > productSale.getQuantity()){
             throw new CustomException(Error.CARTDETAIL_INVALID_QUANTITY);
         }
+        User user=new User();
 
-        CartDetail cartDetail = cartDetailMapper.convertCartDetailCreateDTOToCartDetail(cartDetailCreateDTO, productSale, cart);
-        return cartDetailMapper.convertCartDetailToCartDetailDTO(cartDetailRepository.save(cartDetail));
+        Cart cart = cartRepository.findCartByIdUser(user.getId());
+        CartDetail cartDetail=cartDetailRepository.findByCartAndProductSale(cart,productSale);
+        if (cartDetail != null) {
+            // If the CartDetail exists, update the quantity
+            cartDetail.setQuantity(cartDetail.getQuantity() + cartDetailCreateDTO.getQuantity());
+        } else {
+            // If CartDetail does not exist, create a new one
+           cartDetail = cartDetailMapper.convertCartDetailCreateDTOToCartDetail(cartDetailCreateDTO, productSale, cart);
+        }
+
+
+        // Save the CartDetail
+       CartDetailDTO cartDetailDTO= cartDetailMapper.convertCartDetailToCartDetailDTO(cartDetailRepository.save(cartDetail));
+        cartService.updateCart();
+
+
+        return cartDetailDTO ;
     }
 
     @Override
@@ -79,20 +96,14 @@ public class CartDetailServiceImpl implements CartDetailService{
 
     @Override
     public CartDetailDTO updateCartDetail(CartDetailUpdateDTO cartDetailUpdateDTO) {
-        log.info("Update cart detail: {}", cartDetailUpdateDTO.toString());
-
-        Cart cart = cartRepository.findById(cartDetailUpdateDTO.getCartId())
-                .orElseThrow(()-> new CustomException(Error.CART_NOT_FOUND));
-
-        ProductSale productSale = productSaleRepository.findById(cartDetailUpdateDTO.getProductSaleId())
-                .orElseThrow(()-> new CustomException(Error.PRODUCTSALE_NOT_FOUND));
-
-        if(cartDetailUpdateDTO.getQuantity() > productSale.getQuantity() || cartDetailUpdateDTO.getQuantity() < 0){
-            throw new CustomException(Error.CARTDETAIL_INVALID_QUANTITY);
-        }
+        User user=new User();
+        ProductSale productSale=productSaleRepository.findById(cartDetailUpdateDTO.getProductSaleId()).orElseThrow();
+        Cart cart=cartRepository.findCartByIdUser(user.getId());
 
         CartDetail cartDetail = cartDetailMapper.convertCartDetailUpdateDTOToCartDetail(cartDetailUpdateDTO, productSale, cart);
-        return cartDetailMapper.convertCartDetailToCartDetailDTO(cartDetailRepository.save(cartDetail));
+        CartDetailDTO cartDetailDTO=cartDetailMapper.convertCartDetailToCartDetailDTO(cartDetailRepository.save(cartDetail));
+        cartService.updateCart();
+        return cartDetailDTO;
     }
 
     @Override
@@ -104,5 +115,6 @@ public class CartDetailServiceImpl implements CartDetailService{
                         cartDetail -> cartDetailRepository.delete(cartDetail),
                         () -> { throw new CustomException(Error.CARTDETAIL_NOT_FOUND); }
                 );
+        cartService.updateCart();
     }
 }

@@ -3,7 +3,9 @@ package com.web.bookstore.mapper;
 import com.web.bookstore.dto.cartDTO.cartDTO.CartCreateDTO;
 import com.web.bookstore.dto.cartDTO.cartDTO.CartDTO;
 import com.web.bookstore.dto.cartDTO.cartDTO.CartUpdateDTO;
+import com.web.bookstore.dto.cartDTO.cartdetailDTO.CartDetailDTO;
 import com.web.bookstore.entity.cart.Cart;
+import com.web.bookstore.entity.cart.CartDetail;
 import com.web.bookstore.entity.user.User;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,26 +19,27 @@ public class CartMapper {
 
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private CartDetailMapper cartDetailMapper;
 
-    public Cart convertCartCreateDTOToCart(CartCreateDTO cartCreateDTO, User user) {
+    public Cart convertCartCreateDTOToCart(CartCreateDTO cartCreateDTO) {
         Cart cart = modelMapper.map(cartCreateDTO, Cart.class);
-        cart.setUser(user);
+
         return cart;
     }
 
-    public Cart convertCartUpdateDTOToCart(CartUpdateDTO cartUpdateDTO, User user) {
+    public Cart convertCartUpdateDTOToCart(CartUpdateDTO cartUpdateDTO) {
         Cart cart = modelMapper.map(cartUpdateDTO, Cart.class);
-        cart.setUser(user);
+
         return cart;
     }
 
-    public CartDTO convertCartToCartDTO(Cart cart) {
-        return modelMapper.map(cart, CartDTO.class);
+    public CartDTO convertCartToCartDTO(Cart cart , List<CartDetail> cartDetail) {
+        CartDTO cartDTO=modelMapper.map(cart, CartDTO.class);
+        List<CartDetailDTO> cartDetailDTOS=cartDetail.stream().map(cartDetail1 -> cartDetailMapper.convertCartDetailToCartDetailDTO(cartDetail1)).collect(Collectors.toList());
+        cartDTO.setCartDetailDTOList(cartDetailDTOS);
+        return cartDTO;
     }
 
-    public List<CartDTO> convertCartListToCartDTOList(List<Cart> carts) {
-        return carts.stream()
-                .map(this::convertCartToCartDTO)
-                .collect(Collectors.toList());
-    }
+
 }

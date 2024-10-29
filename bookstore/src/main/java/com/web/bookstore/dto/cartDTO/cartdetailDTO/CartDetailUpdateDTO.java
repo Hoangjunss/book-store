@@ -13,5 +13,5 @@ public class CartDetailUpdateDTO {
     private Integer id;
     private Integer quantity;
     private Integer productSaleId;
-    private Integer cartId;
+
 }
