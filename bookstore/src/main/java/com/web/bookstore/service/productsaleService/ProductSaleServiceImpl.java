@@ -10,7 +10,11 @@ import com.web.bookstore.mapper.ProductSaleMapper;
 import com.web.bookstore.repository.product.ProductRepository;
 import com.web.bookstore.repository.product.ProductSaleRepository;
 import com.web.bookstore.repository.warehouse.WarehouseRepository;
+import jakarta.persistence.criteria.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.Optional;
 
@@ -101,4 +105,32 @@ public class ProductSaleServiceImpl implements ProductSaleService{
         ProductSaleDTO productSaleDTO = productSaleMapper.convertProductSaleToProductSaleDto(savedProductSale);
         return productSaleDTO;
     }
+
+    @Override
+    public Page<ProductSaleDTO> getAllProductSales(String title, Integer categoryId, Double saleStartPrice, Double saleEndPrice, Pageable pageable) {
+        Specification<ProductSale> spec = new Specification<ProductSale>() {
+            @Override
+            public Predicate toPredicate(Root<ProductSale> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+                Join<ProductSale, Product> product = root.join("product", JoinType.INNER);
+                Predicate p = cb.conjunction();
+                if (title != null && !title.isEmpty()) {
+                    p = cb.and(p, cb.like(cb.lower(product.get("title")), "%" + title.toLowerCase() + "%"));
+                }
+                if (categoryId != null && categoryId != 0) {
+                    p = cb.and(p, cb.equal(product.get("category").get("id"), categoryId));
+                }
+                if (saleStartPrice != null) {
+                    p = cb.and(p, cb.greaterThanOrEqualTo(root.get("price"), saleStartPrice));
+                }
+                if (saleEndPrice != null) {
+                    p = cb.and(p, cb.lessThanOrEqualTo(root.get("price"), saleEndPrice));
+                }
+                return p;
+            }
+        };
+
+        Page<ProductSale> productSales = productSaleRepository.findAll(spec, pageable);
+        return productSales.map(productSaleMapper::convertProductSaleToProductSaleDto);
+    }
+
 }
