@@ -1,5 +1,6 @@
 package com.web.bookstore.dto.invoiceDTO.invoicedetailDTO;
 
+import com.web.bookstore.dto.productDTO.productDTO.ProductDTO;
 import com.web.bookstore.entity.invoice.Invoice;
 import com.web.bookstore.entity.product.Product;
 import lombok.AllArgsConstructor;
@@ -16,7 +17,7 @@ import java.math.BigDecimal;
 public class InvoiceDetailDTO {
     private Integer id;
     private Invoice invoice;
-    private Product product;
+    private ProductDTO product;
     private Integer quantity;
     private BigDecimal unitPrice;
     private BigDecimal totalPrice;

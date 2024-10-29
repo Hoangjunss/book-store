@@ -2,6 +2,7 @@ package com.web.bookstore.mapper;
 
 import com.web.bookstore.dto.invoiceDTO.invoiceDTO.InvoiceCreateDTO;
 import com.web.bookstore.dto.invoiceDTO.invoiceDTO.InvoiceDTO;
+import com.web.bookstore.dto.invoiceDTO.invoicedetailDTO.InvoiceDetailDTO;
 import com.web.bookstore.entity.invoice.Invoice;
 import com.web.bookstore.entity.other.Address;
 import com.web.bookstore.entity.user.User;
@@ -21,20 +22,17 @@ public class InvoiceMapper {
     @Autowired
     private ModelMapper modelMapper;
 
-    public Invoice convertInvoiceCreateDTOToInvoice(InvoiceCreateDTO invoiceCreateDTO, User user, Address address) {
+    public Invoice convertInvoiceCreateDTOToInvoice(InvoiceCreateDTO invoiceCreateDTO) {
         Invoice invoice = modelMapper.map(invoiceCreateDTO, Invoice.class);
-        invoice.setUser(user);
-        invoice.setAddress(address);
+
         return invoice;
     }
 
-    public InvoiceDTO convertInvoiceToInvoiceDTO(Invoice invoice) {
-        return modelMapper.map(invoice, InvoiceDTO.class);
+    public InvoiceDTO convertInvoiceToInvoiceDTO(Invoice invoice, List<InvoiceDetailDTO> invoiceDetailDTOS) {
+        InvoiceDTO invoiceDTO= modelMapper.map(invoice, InvoiceDTO.class);
+        invoiceDTO.setInvoiceDetailDTOS(invoiceDetailDTOS);
+        return invoiceDTO;
     }
 
-    public List<InvoiceDTO> convertInvoiceListToInvoiceDTOList(List<Invoice> invoices) {
-        return invoices.stream()
-                .map(this::convertInvoiceToInvoiceDTO)
-                .collect(Collectors.toList());
-    }
+
 }
