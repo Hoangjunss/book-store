@@ -13,7 +13,6 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class InvoiceDetailCreateDTO {
     private Integer id;
-    private Integer invoiceId;
     private Integer productId;
     private Integer quantity;
     private BigDecimal unitPrice;

@@ -54,11 +54,10 @@ public class InvoiceDetailsServiceImpl implements InvoiceDetailsService{
     }
 
     @Override
-    public InvoiceDetailDTO create(InvoiceDetailCreateDTO invoiceDetailCreateDTO) {
+    public InvoiceDetailDTO create(InvoiceDetailCreateDTO invoiceDetailCreateDTO,Invoice invoice) {
         log.info("Create new invoice detail: {}", invoiceDetailCreateDTO.toString());
 
-        Invoice invoice = invoiceRepository.findById(invoiceDetailCreateDTO.getInvoiceId())
-                .orElseThrow();
+
 
         Product product = productRepository.findById(invoiceDetailCreateDTO.getProductId())
                 .orElseThrow(()-> new CustomException(Error.PRODUCT_NOT_FOUND));

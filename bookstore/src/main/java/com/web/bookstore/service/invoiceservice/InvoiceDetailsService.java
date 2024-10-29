@@ -2,6 +2,7 @@ package com.web.bookstore.service.invoiceservice;
 
 import com.web.bookstore.dto.invoiceDTO.invoicedetailDTO.InvoiceDetailCreateDTO;
 import com.web.bookstore.dto.invoiceDTO.invoicedetailDTO.InvoiceDetailDTO;
+import com.web.bookstore.entity.invoice.Invoice;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,5 +11,5 @@ import java.util.List;
 public interface InvoiceDetailsService {
     List<InvoiceDetailDTO> getAllInvoiceDetailByIdInvoice(Integer idInvoice);
     InvoiceDetailDTO findById(Integer id);
-    InvoiceDetailDTO create(InvoiceDetailCreateDTO invoiceDetailCreateDTO);
+    InvoiceDetailDTO create(InvoiceDetailCreateDTO invoiceDetailCreateDTO, Invoice invoice);
 }
