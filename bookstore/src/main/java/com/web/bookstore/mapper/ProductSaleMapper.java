@@ -1,5 +1,6 @@
 package com.web.bookstore.mapper;
 
+import com.web.bookstore.dto.productDTO.productDTO.ProductDTO;
 import com.web.bookstore.dto.productDTO.productsaleDTO.ProductSaleCreateDTO;
 import com.web.bookstore.dto.productDTO.productsaleDTO.ProductSaleDTO;
 import com.web.bookstore.dto.productDTO.productsaleDTO.ProductSaleUpdateDTO;
@@ -17,27 +18,32 @@ public class ProductSaleMapper {
 
     @Autowired
     private ModelMapper mapper;
+    @Autowired
+    private ProductMapper productMapper;
 
-    public ProductSale convertProductSaleCreateDtoToProductSale(ProductSaleCreateDTO createDTO, Product product) {
+    public ProductSale convertProductSaleCreateDtoToProductSale(ProductSaleCreateDTO createDTO) {
         ProductSale productSale = mapper.map(createDTO, ProductSale.class);
-        productSale.setProduct(product);
+
         return productSale;
     }
 
-    public ProductSale convertProductSaleUpdateDtoToProductSale(ProductSaleUpdateDTO updateDTO, Product product) {
+    public ProductSale convertProductSaleUpdateDtoToProductSale(ProductSaleUpdateDTO updateDTO) {
         ProductSale productSale = mapper.map(updateDTO, ProductSale.class);
-        productSale.setProduct(product);
+
         return productSale;
     }
 
-    public ProductSale convertProductSaleDtoToProductSale(ProductSaleDTO productSaleDTO, Product product){
+    public ProductSale convertProductSaleDtoToProductSale(ProductSaleDTO productSaleDTO){
         ProductSale productSale = mapper.map(productSaleDTO, ProductSale.class);
-        productSale.setProduct(product);
         return productSale;
     }
 
     public ProductSaleDTO convertProductSaleToProductSaleDto(ProductSale productSale){
-        return mapper.map(productSale, ProductSaleDTO.class);
+        ProductSaleDTO productSaleDTO= mapper.map(productSale, ProductSaleDTO.class);
+        ProductDTO product=productMapper.conventProductToProductDTO(productSale.getProduct());
+        productSaleDTO.setProduct(product);
+        return productSaleDTO;
+
     }
 
     public List<ProductSaleDTO> convertToDTOList(List<ProductSale> productSales) {

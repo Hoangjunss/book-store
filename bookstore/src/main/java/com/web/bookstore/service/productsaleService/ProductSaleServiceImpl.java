@@ -32,28 +32,17 @@ public class ProductSaleServiceImpl implements ProductSaleService{
     private ProductSaleMapper productSaleMapper;
     @Override
     public ProductSaleDTO createProductSale(ProductSaleCreateDTO createDTO) {
-        Optional<Warehouse> warehouseOptional = warehouseRepository.findByProductId(createDTO.getProductId());
-        if (!warehouseOptional.isPresent()) {
-            throw new RuntimeException("Product not found in warehouse");
-        }
 
-        Warehouse warehouse = warehouseOptional.get();
-        Product product = warehouse.getProduct();
+        Product product=productRepository.findById(createDTO.getProductId()).orElseThrow();
 
-        // Check if there is enough quantity in warehouse
-        if (warehouse.getQuantity() < createDTO.getQuantity()) {
-            throw new RuntimeException("Insufficient quantity in warehouse");
-        }
+
 
         // Use mapper to convert DTO to ProductSale entity
-        ProductSale productSale = productSaleMapper.convertProductSaleCreateDtoToProductSale(createDTO, product);
-
+        ProductSale productSale = productSaleMapper.convertProductSaleCreateDtoToProductSale(createDTO);
+        productSale.setProduct(product);
         // Save ProductSale to the database
         ProductSale savedProductSale = productSaleRepository.save(productSale);
 
-        // Update warehouse quantity
-        warehouse.setQuantity(warehouse.getQuantity() - createDTO.getQuantity());
-        warehouseRepository.save(warehouse);
 
         // Convert saved ProductSale to DTO and return
         ProductSaleDTO productSaleDTO = productSaleMapper.convertProductSaleToProductSaleDto(savedProductSale);
@@ -95,7 +84,7 @@ public class ProductSaleServiceImpl implements ProductSaleService{
         warehouseRepository.save(warehouse);
 
         // Use mapper to update ProductSale entity
-        existingProductSale = productSaleMapper.convertProductSaleUpdateDtoToProductSale(updateDTO, product);
+        existingProductSale = productSaleMapper.convertProductSaleUpdateDtoToProductSale(updateDTO);
         existingProductSale.setId(updateDTO.getId()); // Ensure the ID is set
 
         // Save updated ProductSale to the database
