@@ -1,5 +1,6 @@
 package com.web.bookstore.mapper;
 
+import com.web.bookstore.dto.orderDTO.orderdetailDTO.OrderDetailDTO;
 import com.web.bookstore.dto.orderDTO.ordersDTO.OrdersCreateDTO;
 import com.web.bookstore.dto.orderDTO.ordersDTO.OrdersDTO;
 import com.web.bookstore.dto.orderDTO.ordersDTO.OrdersUpdateDTO;
@@ -19,27 +20,22 @@ public class OrdersMapper {
     @Autowired
     private ModelMapper modelMapper;
 
-    public Orders convertOrdersCreateDTOToOrders(OrdersCreateDTO ordersCreateDTO, User user, Address address) {
+    public Orders convertOrdersCreateDTOToOrders(OrdersCreateDTO ordersCreateDTO) {
         Orders orders = modelMapper.map(ordersCreateDTO, Orders.class);
-        orders.setUser(user);
-        orders.setAddress(address);
+
         return orders;
     }
 
-    public Orders convertOrdersUpdateDTOToOrders(OrdersUpdateDTO ordersUpdateDTO, User user, Address address) {
+    public Orders convertOrdersUpdateDTOToOrders(OrdersUpdateDTO ordersUpdateDTO) {
         Orders orders = modelMapper.map(ordersUpdateDTO, Orders.class);
-        orders.setUser(user);
-        orders.setAddress(address);
         return orders;
     }
 
-    public OrdersDTO convertOrdersToOrdersDTO(Orders orders) {
-        return modelMapper.map(orders, OrdersDTO.class);
+    public OrdersDTO convertOrdersToOrdersDTO(Orders orders, List<OrderDetailDTO> orderDetailDTOS) {
+       OrdersDTO ordersDTO=modelMapper.map(orders, OrdersDTO.class);
+       ordersDTO.setOrderDetailDTOS(orderDetailDTOS);
+       return ordersDTO;
     }
 
-    public List<OrdersDTO> convertOrdersListToOrdersDTOList(List<Orders> ordersList) {
-        return ordersList.stream()
-                .map(this::convertOrdersToOrdersDTO)
-                .collect(Collectors.toList());
-    }
+
 }
