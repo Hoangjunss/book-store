@@ -2,10 +2,7 @@ package com.web.bookstore.entity.order;
 
 import com.web.bookstore.entity.other.Address;
 import com.web.bookstore.entity.user.User;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,4 +26,6 @@ public class Orders {
     @ManyToOne
     @JoinColumn
     private Address address;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus orderStatus;
 }

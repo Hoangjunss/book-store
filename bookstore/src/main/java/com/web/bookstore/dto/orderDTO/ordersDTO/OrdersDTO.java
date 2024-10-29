@@ -1,5 +1,7 @@
 package com.web.bookstore.dto.orderDTO.ordersDTO;
 
+import com.web.bookstore.dto.orderDTO.orderdetailDTO.OrderDetailDTO;
+import com.web.bookstore.dto.otherDTO.addressDTO.AddressDTO;
 import com.web.bookstore.entity.other.Address;
 import com.web.bookstore.entity.user.User;
 import lombok.AllArgsConstructor;
@@ -8,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @Builder
@@ -15,8 +18,9 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class OrdersDTO {
     private Integer  id;
-    private User user;
+    private String username;
     private Integer quantity;
     private BigDecimal totalPrice;
-    private Address address;
+    private AddressDTO address;
+    private List<OrderDetailDTO> orderDetailDTOS;
 }

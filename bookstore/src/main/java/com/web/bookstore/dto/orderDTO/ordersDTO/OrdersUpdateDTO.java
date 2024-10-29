@@ -1,5 +1,6 @@
 package com.web.bookstore.dto.orderDTO.ordersDTO;
 
+import com.web.bookstore.dto.otherDTO.addressDTO.AddressDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,5 +17,5 @@ public class OrdersUpdateDTO {
     private Integer userId;
     private Integer quantity;
     private BigDecimal totalPrice;
-    private Integer addressId;
+    private AddressDTO address;
 }
