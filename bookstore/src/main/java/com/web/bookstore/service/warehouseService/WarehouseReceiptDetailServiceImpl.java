@@ -1,14 +1,19 @@
 package com.web.bookstore.service.warehouseService;
 
-import com.web.bookstore.dto.warehouseDTO.WarehouseReceiptDetailCreateDTO;
-import com.web.bookstore.dto.warehouseDTO.WarehouseReceiptDetailUpdateDTO;
+
+import com.web.bookstore.dto.warehouseDTO.warehousereceiptdetailDTO.WarehouseReceiptDetailCreateDTO;
+import com.web.bookstore.dto.warehouseDTO.warehousereceiptdetailDTO.WarehouseReceiptDetailDTO;
+import com.web.bookstore.dto.warehouseDTO.warehousereceiptdetailDTO.WarehouseReceiptDetailUpdateDTO;
 import com.web.bookstore.entity.product.Product;
 import com.web.bookstore.entity.warehouse.WarehouseReceipt;
 import com.web.bookstore.entity.warehouse.WarehouseReceiptDetail;
 import com.web.bookstore.mapper.WarehouseMapper;
 import com.web.bookstore.repository.product.ProductRepository;
 import com.web.bookstore.repository.warehouse.WarehouseReceiptDetailRepository;
+import com.web.bookstore.repository.warehouse.WarehouseReceiptRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
 
@@ -24,6 +29,8 @@ public class WarehouseReceiptDetailServiceImpl implements WarehouseReceiptDetail
 
     @Autowired
     private WarehouseService warehouseService;
+    @Autowired
+    private WarehouseReceiptRepository warehouseReceiptRepository;
 
     @Override
     public WarehouseReceiptDetail addWarehouseReceiptDetail(WarehouseReceipt warehouseReceipt, WarehouseReceiptDetailCreateDTO detailCreateDTO) {
@@ -71,5 +78,14 @@ public class WarehouseReceiptDetailServiceImpl implements WarehouseReceiptDetail
         warehouseService.updateWarehouse(product, detailUpdateDTO.getQuantity(), detailUpdateDTO.getUnitPrice());
 
         return savedDetail;
+    }
+    @Override
+    public Page<WarehouseReceiptDetailDTO> getList(Pageable pageable, Integer idWarehouse) {
+        WarehouseReceipt warehouseReceipt=warehouseReceiptRepository.findById(idWarehouse).orElseThrow();
+        // Retrieve paginated WarehouseReceiptDetail entities filtered by idWarehouse
+        Page<WarehouseReceiptDetail> details = warehouseReceiptDetailRepository.findByWarehouseReceipt(warehouseReceipt, pageable);
+
+        // Map each WarehouseReceiptDetail entity to WarehouseReceiptDetailDTO
+        return details.map(warehouseMapper::convertWarehouseReceiptDetailToWarehouseReceiptDetailDTO);
     }
 }
