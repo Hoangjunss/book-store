@@ -2,10 +2,22 @@ package com.web.bookstore.config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-public class WebConfig {
+public class WebConfig implements WebMvcConfigurer {
     @Bean
     public ModelMapper modelMapper() {
         return new ModelMapper();
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")  // Áp dụng cho tất cả các đường dẫn
+                .allowedOrigins("*")  // Chấp nhận tất cả các cổng trên localhost
+                .allowedMethods("GET", "PATCH", "POST", "PUT", "DELETE", "OPTIONS")  // Các phương thức HTTP được chấp nhận
+                .allowedHeaders("Authorization", "Content-Type")  // Chấp nhận tất cả các loại header
+                .allowCredentials(false)  // Cho phép credentials như cookie
+                .maxAge(3600);  // Cache CORS response trong 1 giờ
     }
 }
