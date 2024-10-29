@@ -22,4 +22,5 @@ public class Cart {
     @JoinColumn
     private User user;
     private Integer quantity;
+    private Double price;
 }
