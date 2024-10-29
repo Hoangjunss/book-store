@@ -19,4 +19,5 @@ public class Supply {
     @ManyToOne
     @JoinColumn
     private Address address;
+    private boolean status;
 }
