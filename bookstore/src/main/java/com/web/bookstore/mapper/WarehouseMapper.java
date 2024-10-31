@@ -3,7 +3,7 @@ package com.web.bookstore.mapper;
 import com.web.bookstore.dto.warehouseDTO.warehouseDTO.WarehouseCreateDTO;
 import com.web.bookstore.dto.warehouseDTO.warehouseDTO.WarehouseDTO;
 import com.web.bookstore.dto.warehouseDTO.warehouseDTO.WarehouseUpdateDTO;
-import com.web.bookstore.dto.warehouseDTO.warehousereceiptDTO.WareHouseReceiptCreateDTO;
+import com.web.bookstore.dto.warehouseDTO.warehousereceiptDTO.WarehouseReceiptCreateDTO;
 import com.web.bookstore.dto.warehouseDTO.warehousereceiptDTO.WarehouseReceiptDTO;
 import com.web.bookstore.dto.warehouseDTO.warehousereceiptDTO.WarehouseReceiptUpdateDTO;
 import com.web.bookstore.dto.warehouseDTO.warehousereceiptdetailDTO.WarehouseReceiptDetailCreateDTO;
@@ -40,7 +40,7 @@ public class WarehouseMapper {
         warehouseDTO.setProductName(warehouse.getProduct().getName());
         return warehouseDTO;
     }
-    public WarehouseReceipt convertWarehouseReceiptCreateDTOToWarehouseReceipt(WareHouseReceiptCreateDTO warehouseReceiptCreateDTO, Supply supply) {
+    public WarehouseReceipt convertWarehouseReceiptCreateDTOToWarehouseReceipt(WarehouseReceiptCreateDTO warehouseReceiptCreateDTO, Supply supply) {
         WarehouseReceipt warehouseReceipt = mapper.map(warehouseReceiptCreateDTO, WarehouseReceipt.class);
         warehouseReceipt.setSupply(supply);
         return warehouseReceipt;

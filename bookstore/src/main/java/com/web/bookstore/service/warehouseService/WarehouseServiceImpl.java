@@ -1,11 +1,15 @@
 package com.web.bookstore.service.warehouseService;
 
-import com.web.bookstore.dto.warehouseDTO.WarehouseCreateDTO;
+
+import com.web.bookstore.dto.warehouseDTO.warehouseDTO.WarehouseCreateDTO;
+import com.web.bookstore.dto.warehouseDTO.warehouseDTO.WarehouseDTO;
 import com.web.bookstore.entity.product.Product;
 import com.web.bookstore.entity.warehouse.Warehouse;
 import com.web.bookstore.mapper.WarehouseMapper;
 import com.web.bookstore.repository.warehouse.WarehouseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -19,15 +23,7 @@ public class WarehouseServiceImpl implements WarehouseService{
     private WarehouseMapper warehouseMapper;
     @Override
     public void updateWarehouse(Product product, Integer quantity, BigDecimal unitPrice) {
-        Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProduct(product);
-        Warehouse warehouse;
 
-        if (optionalWarehouse.isPresent()) {
-            warehouse = optionalWarehouse.get();
-            warehouse.setQuantity(warehouse.getQuantity() + quantity);
-            warehouse.setPrice(unitPrice);
-            warehouse.setDate(LocalDate.now());
-        } else {
             WarehouseCreateDTO warehouseCreateDTO = new WarehouseCreateDTO();
             warehouseCreateDTO.setIdProduct(product.getId());
             warehouseCreateDTO.setQuantity(quantity);
@@ -35,10 +31,18 @@ public class WarehouseServiceImpl implements WarehouseService{
             warehouseCreateDTO.setStatus(true);
             warehouseCreateDTO.setDate(LocalDate.now());
 
-            warehouse = warehouseMapper.conventWarehouseCreateDTOToWarehouse(warehouseCreateDTO, product);
-        }
+           Warehouse warehouse = warehouseMapper.conventWarehouseCreateDTOToWarehouse(warehouseCreateDTO, product);
+
 
         warehouseRepository.save(warehouse);
+    }
+    @Override
+    public Page<WarehouseDTO> getList(Pageable pageable) {
+        // Retrieve paginated Warehouse entities
+        Page<Warehouse> warehouses = warehouseRepository.findAll(pageable);
+
+        // Map each Warehouse entity to WarehouseDTO and return as a Page
+        return warehouses.map(warehouseMapper::conventWarehouseToWarehouseDTO);
     }
 
 }

@@ -1,33 +1,46 @@
 package com.web.bookstore.service.warehouseService;
 
-import com.web.bookstore.dto.warehouseDTO.*;
+
+import com.web.bookstore.dto.warehouseDTO.warehousereceiptDTO.WarehouseReceiptCreateDTO;
+import com.web.bookstore.dto.warehouseDTO.warehousereceiptDTO.WarehouseReceiptDTO;
+import com.web.bookstore.dto.warehouseDTO.warehousereceiptDTO.WarehouseReceiptUpdateDTO;
+import com.web.bookstore.dto.warehouseDTO.warehousereceiptdetailDTO.WarehouseReceiptDetailCreateDTO;
+import com.web.bookstore.dto.warehouseDTO.warehousereceiptdetailDTO.WarehouseReceiptDetailUpdateDTO;
 import com.web.bookstore.entity.user.Supply;
 import com.web.bookstore.entity.warehouse.WarehouseReceipt;
 import com.web.bookstore.entity.warehouse.WarehouseReceiptDetail;
 import com.web.bookstore.mapper.WarehouseMapper;
-import com.web.bookstore.repository.user.SuplyRepository;
+
+import com.web.bookstore.repository.user.SupplyRepository;
+import com.web.bookstore.repository.warehouse.WarehouseReceiptDetailRepository;
 import com.web.bookstore.repository.warehouse.WarehouseReceiptRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class WarehouseReceiptServiceImpl implements WareHouseReceiptService{
+public class WarehouseReceiptServiceImpl implements WarehouseReceiptService{
 
     @Autowired
     private WarehouseReceiptRepository warehouseReceiptRepository;
 
     @Autowired
-    private SuplyRepository supplyRepository;
+    private SupplyRepository supplyRepository;
 
     @Autowired
     private WarehouseMapper warehouseMapper;
 
     @Autowired
     private WarehouseReceiptDetailService warehouseReceiptDetailService;
+    @Autowired
+    private WarehouseReceiptDetailRepository warehouseReceiptDetailRepository;
+
     @Override
-    public WarehouseReceiptDTO addWarehouseReceipt(WareHouseReceiptCreateDTO createDTO) {
+    public WarehouseReceiptDTO addWarehouseReceipt(WarehouseReceiptCreateDTO createDTO) {
+
         Optional<Supply> optionalSupply = supplyRepository.findById(createDTO.getIdSupply());
         if (!optionalSupply.isPresent()) {
             throw new RuntimeException("Supply not found");
@@ -73,5 +86,19 @@ public class WarehouseReceiptServiceImpl implements WareHouseReceiptService{
         WarehouseReceiptDTO warehouseReceiptDTO = warehouseMapper.convertWarehouseReceiptToWarehouseReceiptDTO(savedWarehouseReceipt, warehouseReceiptDetails);
         return warehouseReceiptDTO;
     }
+    @Override
+    public Page<WarehouseReceiptDTO> getList(Pageable pageable) {
+        // Retrieve paginated WarehouseReceipt entities
+        Page<WarehouseReceipt> warehouseReceipts = warehouseReceiptRepository.findAll(pageable);
 
+        // Map each WarehouseReceipt entity to WarehouseReceiptDTO, including details
+        return warehouseReceipts.map(warehouseReceipt -> {
+            // Fetch associated WarehouseReceiptDetails for each WarehouseReceipt
+            List<WarehouseReceiptDetail> warehouseReceiptDetails = warehouseReceiptDetailRepository
+                    .findByWarehouseReceipt(warehouseReceipt);
+
+            // Use the existing mapper to convert to WarehouseReceiptDTO with details
+            return warehouseMapper.convertWarehouseReceiptToWarehouseReceiptDTO(warehouseReceipt, warehouseReceiptDetails);
+        });
+    }
 }
