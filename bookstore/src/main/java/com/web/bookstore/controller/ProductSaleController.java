@@ -5,6 +5,7 @@ import com.web.bookstore.service.productsaleService.ProductSaleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 public class ProductSaleController {
     @Autowired
     private ProductSaleService productSaleService;
-
+    @PreAuthorize("permitAll()")
     @GetMapping
     public Page<ProductSaleDTO> getAllProductSales(
             @RequestParam(value = "title", required = false) String title,

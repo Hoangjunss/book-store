@@ -16,6 +16,8 @@ import com.web.bookstore.repository.other.AddressRepository;
 import com.web.bookstore.repository.user.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -42,7 +44,8 @@ public class InvoiceServiceImpl implements InvoiceService{
     public InvoiceDTO create(InvoiceCreateDTO invoiceCreateDTO) {
         log.info("Invoice crete: {}", invoiceCreateDTO.toString());
 
-        User user = new User();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
 
         Address address = addressRepository.findById(invoiceCreateDTO.getAddress().getId())
                 .orElseThrow(()-> new CustomException(Error.ADDRESS_NOT_FOUND));

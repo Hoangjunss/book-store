@@ -14,6 +14,8 @@ import com.web.bookstore.repository.cart.CartRepository;
 import com.web.bookstore.repository.user.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -56,7 +58,8 @@ public class CartServiceImpl implements CartService{
     public CartDTO createCart(CartCreateDTO cartCreateDTO) {
         log.info("Creating new cart for user: {}", cartCreateDTO.toString());
 
-        User user = new User();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
 
         Cart cart = cartMapper.convertCartCreateDTOToCart(cartCreateDTO);
         cart.setUser(user);
@@ -66,7 +69,8 @@ public class CartServiceImpl implements CartService{
 
     @Override
     public CartDTO updateCart() {
-     User user=new User();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
      Cart cart=cartRepository.findCartByIdUser(user.getId());
         List<CartDetail >cartDetails=cartDetailRepository.findByCart(cart);
         Integer quantity=cartDetails.stream().mapToInt(CartDetail::getQuantity).sum();

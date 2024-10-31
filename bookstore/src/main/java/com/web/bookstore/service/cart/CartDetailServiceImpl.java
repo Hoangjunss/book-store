@@ -15,6 +15,8 @@ import com.web.bookstore.repository.cart.CartRepository;
 import com.web.bookstore.repository.product.ProductSaleRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -58,7 +60,8 @@ public class CartDetailServiceImpl implements CartDetailService{
         if(cartDetailCreateDTO.getQuantity() > productSale.getQuantity()){
             throw new CustomException(Error.CARTDETAIL_INVALID_QUANTITY);
         }
-        User user=new User();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
 
         Cart cart = cartRepository.findCartByIdUser(user.getId());
         CartDetail cartDetail=cartDetailRepository.findByCartAndProductSale(cart,productSale);
@@ -96,7 +99,8 @@ public class CartDetailServiceImpl implements CartDetailService{
 
     @Override
     public CartDetailDTO updateCartDetail(CartDetailUpdateDTO cartDetailUpdateDTO) {
-        User user=new User();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
         ProductSale productSale=productSaleRepository.findById(cartDetailUpdateDTO.getProductSaleId()).orElseThrow();
         Cart cart=cartRepository.findCartByIdUser(user.getId());
 
