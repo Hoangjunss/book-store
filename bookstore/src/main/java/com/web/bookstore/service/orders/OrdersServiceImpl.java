@@ -15,6 +15,8 @@ import com.web.bookstore.repository.user.UserRepository;
 import jakarta.persistence.Id;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -70,7 +72,8 @@ public class OrdersServiceImpl implements OrdersService{
     public OrdersDTO create(OrdersCreateDTO ordersCreateDTO) {
         log.info("Create Order: {} " , ordersCreateDTO.toString());
 
-        User user=new User();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
 
         Address address = addressRepository.findById(ordersCreateDTO.getAddress().getId())
                 .orElseThrow(()-> new CustomException(Error.ADDRESS_NOT_FOUND));
