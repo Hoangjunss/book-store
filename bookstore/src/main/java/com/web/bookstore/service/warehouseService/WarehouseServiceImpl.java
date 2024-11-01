@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.UUID;
+
 @Service
 public class WarehouseServiceImpl implements WarehouseService{
     @Autowired
@@ -44,6 +46,11 @@ public class WarehouseServiceImpl implements WarehouseService{
 
         // Map each Warehouse entity to WarehouseDTO and return as a Page
         return warehouses.map(warehouseMapper::conventWarehouseToWarehouseDTO);
+    }
+    public Integer getGenerationId() {
+        UUID uuid = UUID.randomUUID();
+        // Use most significant bits and ensure it's within the integer range
+        return (int) (uuid.getMostSignificantBits() & 0xFFFFFFFFL);
     }
 
 }
