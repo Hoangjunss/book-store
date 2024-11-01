@@ -5,11 +5,12 @@ import com.web.bookstore.service.productsaleService.ProductSaleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/productsales")
+@RequestMapping("/productsales")
 public class ProductSaleController {
     @Autowired
     private ProductSaleService productSaleService;
@@ -25,5 +26,9 @@ public class ProductSaleController {
     ) {
         PageRequest pageRequest = PageRequest.of(page, size);
         return productSaleService.getAllProductSales(title, categoryId, saleStartPrice, saleEndPrice, pageRequest);
+    }
+    @GetMapping("/id")
+    public ResponseEntity<ProductSaleDTO> getProductSale(@RequestParam Integer id){
+        return ResponseEntity.ok( productSaleService.findById(id));
     }
 }

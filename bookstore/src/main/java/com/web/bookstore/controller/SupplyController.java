@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/supplies")
+@RequestMapping("/supplies")
 public class SupplyController {
 
     @Autowired
@@ -53,6 +53,14 @@ public class SupplyController {
 
         Pageable pageable = PageRequest.of(page, size);
         Page<SupplyDTO> supplyList = supplyService.getList(pageable);
+        return ResponseEntity.ok(supplyList);
+    }
+    @GetMapping("/id")
+    public ResponseEntity<SupplyDTO> getId(
+           @RequestParam Integer id) {
+
+
+        SupplyDTO supplyList = supplyService.findById(id);
         return ResponseEntity.ok(supplyList);
     }
 }

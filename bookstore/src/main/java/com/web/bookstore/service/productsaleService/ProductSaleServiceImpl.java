@@ -135,4 +135,10 @@ public class ProductSaleServiceImpl implements ProductSaleService{
         return productSales.map(productSaleMapper::convertProductSaleToProductSaleDto);
     }
 
+    @Override
+    public ProductSaleDTO findById(Integer id) {
+        ProductSale productSale=productSaleRepository.findById(id).orElseThrow();
+        return  productSaleMapper.convertProductSaleToProductSaleDto(productSale);
+    }
+
 }

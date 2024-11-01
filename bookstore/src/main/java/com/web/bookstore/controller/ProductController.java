@@ -42,4 +42,13 @@ public class ProductController {
 
         return ResponseEntity.ok(products);
     }
+    @PreAuthorize("permitAll()")
+    @GetMapping("/id")
+    public ResponseEntity<ProductDTO> getProducts( @RequestParam Integer id) {
+
+
+        ProductDTO products = productService.findById(id);
+
+        return ResponseEntity.ok(products);
+    }
 }

@@ -12,5 +12,6 @@ public interface SupplyService {
     SupplyDTO updateSupply(SupplyDTO supplyDTO);
     SupplyDTO deleteSupply(Integer id);
     Page<SupplyDTO> getList(Pageable pageable);
+    SupplyDTO findById(Integer id);
 
 }

@@ -6,12 +6,15 @@ import com.web.bookstore.dto.user.UserLoginDTO;
 import com.web.bookstore.dto.user.UserRegistrationDTO;
 import com.web.bookstore.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/users")
 public class UserController {
     @Autowired
     private  UserService userService;
@@ -34,5 +37,12 @@ public class UserController {
     public ResponseEntity<AuthenticationDTO> refreshToken(@RequestParam String token) {
         AuthenticationDTO authDTO = userService.generateRefreshToken(token);
         return new ResponseEntity<>(authDTO, HttpStatus.OK);
+    }
+    @GetMapping()
+    public ResponseEntity<Page<UserDTO>>getRole(@RequestParam String role, @RequestParam(defaultValue = "0") int page,
+                                                @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+       Page<UserDTO> userDTOS=userService.getRole(role,pageable);
+        return new ResponseEntity<>(userDTOS, HttpStatus.OK);
     }
 }
