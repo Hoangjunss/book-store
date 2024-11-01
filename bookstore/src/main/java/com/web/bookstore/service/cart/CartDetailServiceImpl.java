@@ -63,7 +63,7 @@ public class CartDetailServiceImpl implements CartDetailService{
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
 
-        Cart cart = cartRepository.findCartByIdUser(user.getId());
+        Cart cart = cartRepository.findCartByUser(user);
         CartDetail cartDetail=cartDetailRepository.findByCartAndProductSale(cart,productSale);
         if (cartDetail != null) {
             // If the CartDetail exists, update the quantity
@@ -102,7 +102,7 @@ public class CartDetailServiceImpl implements CartDetailService{
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
         ProductSale productSale=productSaleRepository.findById(cartDetailUpdateDTO.getProductSaleId()).orElseThrow();
-        Cart cart=cartRepository.findCartByIdUser(user.getId());
+        Cart cart=cartRepository.findCartByUser(user);
 
         CartDetail cartDetail = cartDetailMapper.convertCartDetailUpdateDTOToCartDetail(cartDetailUpdateDTO, productSale, cart);
         CartDetailDTO cartDetailDTO=cartDetailMapper.convertCartDetailToCartDetailDTO(cartDetailRepository.save(cartDetail));

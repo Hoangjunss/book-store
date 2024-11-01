@@ -5,5 +5,5 @@ import com.web.bookstore.entity.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CartRepository extends JpaRepository<Cart,Integer> {
-    Cart findCartByIdUser(Integer idUser);
+    Cart findCartByUser(User user);
 }

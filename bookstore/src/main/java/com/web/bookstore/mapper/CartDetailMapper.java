@@ -21,14 +21,14 @@ public class CartDetailMapper {
 
     public CartDetail convertCartDetailCreateDTOToCartDetail(CartDetailCreateDTO cartDetailCreateDTO, ProductSale productSale, Cart cart) {
         CartDetail cartDetail = modelMapper.map(cartDetailCreateDTO, CartDetail.class);
-        cartDetail.setProduct(productSale);
+        cartDetail.setProductSale(productSale);
         cartDetail.setCart(cart);
         return cartDetail;
     }
 
     public CartDetail convertCartDetailUpdateDTOToCartDetail(CartDetailUpdateDTO cartDetailUpdateDTO, ProductSale productSale, Cart cart) {
         CartDetail cartDetail = modelMapper.map(cartDetailUpdateDTO, CartDetail.class);
-        cartDetail.setProduct(productSale);
+        cartDetail.setProductSale(productSale);
         cartDetail.setCart(cart);
         return cartDetail;
     }

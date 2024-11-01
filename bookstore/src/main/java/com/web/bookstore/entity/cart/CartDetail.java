@@ -21,7 +21,7 @@ public class CartDetail {
     private Integer quantity;
     @ManyToOne
     @JoinColumn
-    private ProductSale product;
+    private ProductSale productSale;
     @ManyToOne
     @JoinColumn
     private Cart cart;
