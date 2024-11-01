@@ -13,4 +13,5 @@ public interface WarehouseReceiptService {
     WarehouseReceiptDTO addWarehouseReceipt(WarehouseReceiptCreateDTO createDTO);
     WarehouseReceiptDTO updateWarehouseReceipt(WarehouseReceiptUpdateDTO updateDTO);
     Page<WarehouseReceiptDTO> getList(Pageable pageable);
+    WarehouseReceiptDTO findById(Integer id);
 }

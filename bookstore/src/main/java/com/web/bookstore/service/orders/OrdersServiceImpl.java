@@ -89,6 +89,15 @@ public class OrdersServiceImpl implements OrdersService{
     }
 
     @Override
+    public OrdersDTO update(Integer id, String status) {
+        Orders orders=orderRepository.findById(id).orElseThrow();
+        orders.setOrderStatus(OrderStatus.valueOf(status));
+        Orders ordersSave=orderRepository.save(orders);
+        List<OrderDetailDTO> orderDetailDTOS=orderDetailsService.findAllByOrder(ordersSave.getId());
+        return ordersMapper.convertOrdersToOrdersDTO(ordersSave,orderDetailDTOS);
+    }
+
+    @Override
     public Page<OrdersDTO> getStatus(Pageable pageable, String status) {
         // Chuyển đổi chuỗi thành OrderStatus
         OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase());

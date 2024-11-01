@@ -48,4 +48,9 @@ public class OrderController {
         Page<OrdersDTO> ordersDTOS=ordersService.getStatus(pageable,status);
         return ResponseEntity.ok(ordersDTOS);
     }
+    @PatchMapping
+    public ResponseEntity<OrdersDTO> updateOrder(@RequestParam Integer id,@RequestParam String status) {
+        OrdersDTO createdOrder = ordersService.update(id,status);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
+    }
 }

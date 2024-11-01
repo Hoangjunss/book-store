@@ -102,4 +102,11 @@ public class WarehouseReceiptServiceImpl implements WarehouseReceiptService{
             return warehouseMapper.convertWarehouseReceiptToWarehouseReceiptDTO(warehouseReceipt, warehouseReceiptDetails);
         });
     }
+
+    @Override
+    public WarehouseReceiptDTO findById(Integer id) {
+        WarehouseReceipt warehouseReceipt=warehouseReceiptRepository.findById(id).orElseThrow();
+        List<WarehouseReceiptDetail> warehouseReceiptDetails=warehouseReceiptDetailRepository.findByWarehouseReceipt(warehouseReceipt);
+        return warehouseMapper.convertWarehouseReceiptToWarehouseReceiptDTO(warehouseReceipt,warehouseReceiptDetails);
+    }
 }
