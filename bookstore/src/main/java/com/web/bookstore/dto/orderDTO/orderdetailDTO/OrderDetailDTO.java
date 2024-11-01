@@ -1,5 +1,6 @@
 package com.web.bookstore.dto.orderDTO.orderdetailDTO;
 
+import com.web.bookstore.dto.productDTO.productDTO.ProductDTO;
 import com.web.bookstore.entity.order.Orders;
 import com.web.bookstore.entity.product.Product;
 import lombok.AllArgsConstructor;
@@ -15,8 +16,8 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class OrderDetailDTO {
     private Integer id;
-    private Orders orders;
-    private Product product;
+
+    private ProductDTO product;
     private Integer quantity;
     private BigDecimal unitPrice;
     private BigDecimal totalPrice;
