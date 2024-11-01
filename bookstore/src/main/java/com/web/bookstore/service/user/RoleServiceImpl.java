@@ -18,7 +18,7 @@ public class RoleServiceImpl implements RoleService{
 
     @Override
     public Role findByName(String name) {
-        return roleRepository.findByName(name).orElseThrow();
+        return roleRepository.findByRole(name).orElseThrow();
     }
 
     public Integer getGenerationId() {

@@ -5,7 +5,9 @@ import com.web.bookstore.dto.productDTO.productsaleDTO.ProductSaleDTO;
 import com.web.bookstore.dto.productDTO.productsaleDTO.ProductSaleUpdateDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
+@Service
 public interface ProductSaleService {
     ProductSaleDTO createProductSale(ProductSaleCreateDTO createDTO);
     ProductSaleDTO updateProductSale(ProductSaleUpdateDTO updateDTO);

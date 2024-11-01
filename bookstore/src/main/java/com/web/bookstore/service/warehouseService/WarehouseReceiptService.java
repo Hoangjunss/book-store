@@ -6,7 +6,9 @@ import com.web.bookstore.dto.warehouseDTO.warehousereceiptDTO.WarehouseReceiptDT
 import com.web.bookstore.dto.warehouseDTO.warehousereceiptDTO.WarehouseReceiptUpdateDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
+@Service
 public interface WarehouseReceiptService {
     WarehouseReceiptDTO addWarehouseReceipt(WarehouseReceiptCreateDTO createDTO);
     WarehouseReceiptDTO updateWarehouseReceipt(WarehouseReceiptUpdateDTO updateDTO);

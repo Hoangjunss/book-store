@@ -47,9 +47,10 @@ public class CartServiceImpl implements CartService{
 
     @Override
     public CartDTO findByUser() {
-        User user=new User();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
 
-        Cart cart=cartRepository.findCartByIdUser(user.getId());
+        Cart cart=cartRepository.findCartByUser(user);
         List<CartDetail >cartDetails=cartDetailRepository.findByCart(cart);
         return cartMapper.convertCartToCartDTO(cart,cartDetails);
     }
@@ -71,11 +72,11 @@ public class CartServiceImpl implements CartService{
     public CartDTO updateCart() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
-     Cart cart=cartRepository.findCartByIdUser(user.getId());
+     Cart cart=cartRepository.findCartByUser(user);
         List<CartDetail >cartDetails=cartDetailRepository.findByCart(cart);
         Integer quantity=cartDetails.stream().mapToInt(CartDetail::getQuantity).sum();
         Double total=cartDetails.stream()
-                .mapToDouble(cartDetail->cartDetail.getQuantity()*cartDetail.getProduct().getPrice())
+                .mapToDouble(cartDetail->cartDetail.getQuantity()*cartDetail.getProductSale().getPrice())
                 .sum();
         cart.setQuantity(quantity);
         cart.setPrice(total);
