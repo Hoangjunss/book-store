@@ -34,6 +34,7 @@ public class OrdersMapper {
     public OrdersDTO convertOrdersToOrdersDTO(Orders orders, List<OrderDetailDTO> orderDetailDTOS) {
        OrdersDTO ordersDTO=modelMapper.map(orders, OrdersDTO.class);
        ordersDTO.setOrderDetailDTOS(orderDetailDTOS);
+       ordersDTO.setUsername(orders.getUser().getUsername());
        return ordersDTO;
     }
 

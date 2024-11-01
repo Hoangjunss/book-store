@@ -64,4 +64,9 @@ public class WarehouseReceiptController {
 
         return ResponseEntity.ok(details);
     }
+    @GetMapping("/id")
+    public ResponseEntity<WarehouseReceiptDTO> getId(@RequestParam Integer id){
+        WarehouseReceiptDTO warehouseReceiptDTO=warehouseReceiptService.findById(id);
+        return ResponseEntity.ok(warehouseReceiptDTO);
+    }
 }

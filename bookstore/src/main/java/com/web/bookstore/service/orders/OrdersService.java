@@ -14,5 +14,6 @@ public interface OrdersService {
     List<OrdersDTO> findAllOrdersByUser(Integer idUser);
     OrdersDTO findById(Integer idOder);
     OrdersDTO create(OrdersCreateDTO ordersCreateDTO);
+    OrdersDTO update(Integer id,String status);
     Page<OrdersDTO> getStatus(Pageable pageable,String status);
 }
