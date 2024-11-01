@@ -15,6 +15,8 @@ import com.web.bookstore.service.JwtTokenUtil;
 import com.web.bookstore.service.OurUserDetailsService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -99,6 +101,15 @@ public class UserServiceImpl implements UserService{
 
         return  AuthenticationDTO.builder().token(jwtToken).refreshToken(refreshToken).build();
     }
+
+    @Override
+    public Page<UserDTO> getRole(String role, Pageable pageable) {
+        Role role1=roleService.findByName(role);
+
+        Page<User> users= userRepository.findAllByRole(role1,pageable);
+      return users.map(userMapper::convertUserToCreateUserResponse);
+    }
+
     private boolean usernameExists(String username) {
         return userRepository.findByUsername(username).isPresent();
     }

@@ -79,4 +79,10 @@ public class SupplyServiceImpl implements SupplyService {
         // Convert each Supply entity to SupplyDTO and return as a list
         return supplies.map(supplyMapper::conventSupplyToSupplyDTO);
     }
+
+    @Override
+    public SupplyDTO findById(Integer id) {
+        Supply supply=supplyRepository.findById(id).orElseThrow();
+        return supplyMapper.conventSupplyToSupplyDTO(supply);
+    }
 }

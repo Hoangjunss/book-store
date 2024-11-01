@@ -3,6 +3,8 @@ package com.web.bookstore.service.orders;
 import com.web.bookstore.dto.orderDTO.ordersDTO.OrdersCreateDTO;
 import com.web.bookstore.dto.orderDTO.ordersDTO.OrdersDTO;
 import com.web.bookstore.entity.user.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,4 +14,5 @@ public interface OrdersService {
     List<OrdersDTO> findAllOrdersByUser(Integer idUser);
     OrdersDTO findById(Integer idOder);
     OrdersDTO create(OrdersCreateDTO ordersCreateDTO);
+    Page<OrdersDTO> getStatus(Pageable pageable,String status);
 }

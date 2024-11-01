@@ -12,4 +12,5 @@ public interface ProductSaleService {
     ProductSaleDTO createProductSale(ProductSaleCreateDTO createDTO);
     ProductSaleDTO updateProductSale(ProductSaleUpdateDTO updateDTO);
     Page<ProductSaleDTO> getAllProductSales(String title, Integer categoryId, Double saleStartPrice, Double saleEndPrice, Pageable pageable);
+    ProductSaleDTO findById(Integer id);
 }

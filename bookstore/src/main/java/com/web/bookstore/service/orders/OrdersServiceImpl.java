@@ -3,6 +3,7 @@ package com.web.bookstore.service.orders;
 import com.web.bookstore.dto.orderDTO.orderdetailDTO.OrderDetailDTO;
 import com.web.bookstore.dto.orderDTO.ordersDTO.OrdersCreateDTO;
 import com.web.bookstore.dto.orderDTO.ordersDTO.OrdersDTO;
+import com.web.bookstore.entity.order.OrderStatus;
 import com.web.bookstore.entity.order.Orders;
 import com.web.bookstore.entity.other.Address;
 import com.web.bookstore.entity.user.User;
@@ -15,6 +16,8 @@ import com.web.bookstore.repository.user.UserRepository;
 import jakarta.persistence.Id;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -84,4 +87,23 @@ public class OrdersServiceImpl implements OrdersService{
         List<OrderDetailDTO> orderDetailDTOS=ordersCreateDTO.getOrderDetailCreateDTOS().stream().map(orderDetailCreateDTO -> orderDetailsService.create(orderDetailCreateDTO)).collect(Collectors.toList());
         return ordersMapper.convertOrdersToOrdersDTO(orderRepository.save(orders),orderDetailDTOS);
     }
+
+    @Override
+    public Page<OrdersDTO> getStatus(Pageable pageable, String status) {
+        // Chuyển đổi chuỗi thành OrderStatus
+        OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase());
+
+        // Lấy danh sách Orders theo trạng thái và phân trang
+        Page<Orders> ordersPage = orderRepository.findByOrderStatus(orderStatus, pageable);
+
+        // Chuyển đổi mỗi Orders thành OrdersDTO và bao gồm danh sách OrderDetailDTO
+        return ordersPage.map(order -> {
+            // Lấy danh sách OrderDetailDTO cho từng đơn hàng
+            List<OrderDetailDTO> orderDetailDTOS = orderDetailsService.findAllByOrder(order.getId());
+
+            // Chuyển đổi Orders sang OrdersDTO, và set OrderDetailDTOS
+            return ordersMapper.convertOrdersToOrdersDTO(order, orderDetailDTOS);
+        });
+    }
+
 }
