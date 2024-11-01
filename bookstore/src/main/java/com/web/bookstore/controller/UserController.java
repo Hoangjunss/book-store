@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 
@@ -20,13 +21,13 @@ public class UserController {
     private  UserService userService;
 
 
-
+    @PreAuthorize("permitAll()")
     @PostMapping("/register")
     public ResponseEntity<UserDTO> registerUser(@RequestBody UserRegistrationDTO createUserRequest) {
         UserDTO userDTO = userService.registration(createUserRequest);
         return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
     }
-
+    @PreAuthorize("permitAll()")
     @PostMapping("/signin")
     public ResponseEntity<AuthenticationDTO> signIn(@RequestBody UserLoginDTO user) {
         AuthenticationDTO authDTO = userService.signIn(user);
