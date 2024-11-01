@@ -42,7 +42,15 @@ private JwtAuthenticationFilter jwtAuthenticationFilter;
                 .csrf(AbstractHttpConfigurer::disable)
 
                 // Configure các luồng truy cập
-                .authorizeHttpRequests((auth) -> auth.requestMatchers("/user/signup","/user/signin","/user/refreshtoken","/image").permitAll()
+                .authorizeHttpRequests((auth) -> auth.requestMatchers("/user/signup","/user/signin","/user/refreshtoken","/image",
+                                "/api/v1/warehouses",
+                                "/api/v1/warehouses/*",
+                                "/api/v1/warehouse-receipts",
+                                "/api/v1/warehouse-receipts/*",
+                                "/api/productsales",
+                                "/api/productsales/*",
+                                "/product",
+                                "/product/*").permitAll()
                     // Xác thực tất cả các request
                         .anyRequest()
                         .authenticated()

@@ -15,10 +15,10 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")  // Áp dụng cho tất cả các đường dẫn
-                .allowedOrigins("*")  // Chấp nhận tất cả các cổng trên localhost
-                .allowedMethods("GET", "PATCH", "POST", "PUT", "DELETE", "OPTIONS")  // Các phương thức HTTP được chấp nhận
-                .allowedHeaders("Authorization", "Content-Type")  // Chấp nhận tất cả các loại header
-                .allowCredentials(false)  // Cho phép credentials như cookie
-                .maxAge(3600);  // Cache CORS response trong 1 giờ
+                .allowedOrigins("http://localhost:8000")  // Chỉ chấp nhận từ localhost:8000
+                .allowedMethods("GET", "PATCH", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedHeaders("Authorization", "Content-Type")
+                .allowCredentials(true)  // Đặt thành true để cho phép gửi credentials
+                .maxAge(3600);
     }
 }

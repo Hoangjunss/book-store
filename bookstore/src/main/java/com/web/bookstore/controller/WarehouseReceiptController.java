@@ -42,6 +42,7 @@ public class WarehouseReceiptController {
         WarehouseReceiptDTO updatedReceipt = warehouseReceiptService.updateWarehouseReceipt(updateDTO);
         return ResponseEntity.ok(updatedReceipt);
     }
+
     @GetMapping("/warehouse")
     public ResponseEntity<Page<WarehouseReceiptDTO>> getAllWarehouseReceipts(
             @RequestParam(defaultValue = "0") int page,
