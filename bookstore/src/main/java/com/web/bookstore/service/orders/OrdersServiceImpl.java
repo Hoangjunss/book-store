@@ -23,6 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -84,6 +85,7 @@ public class OrdersServiceImpl implements OrdersService{
         Orders orders = ordersMapper.convertOrdersCreateDTOToOrders(ordersCreateDTO);
         orders.setUser(user);
         orders.setAddress(address);
+        orders.setId(getGenerationId());
         List<OrderDetailDTO> orderDetailDTOS=ordersCreateDTO.getOrderDetailCreateDTOS().stream().map(orderDetailCreateDTO -> orderDetailsService.create(orderDetailCreateDTO)).collect(Collectors.toList());
         return ordersMapper.convertOrdersToOrdersDTO(orderRepository.save(orders),orderDetailDTOS);
     }
@@ -113,6 +115,11 @@ public class OrdersServiceImpl implements OrdersService{
             // Chuyển đổi Orders sang OrdersDTO, và set OrderDetailDTOS
             return ordersMapper.convertOrdersToOrdersDTO(order, orderDetailDTOS);
         });
+    }
+    public Integer getGenerationId() {
+        UUID uuid = UUID.randomUUID();
+        // Use most significant bits and ensure it's within the integer range
+        return (int) (uuid.getMostSignificantBits() & 0xFFFFFFFFL);
     }
 
 }

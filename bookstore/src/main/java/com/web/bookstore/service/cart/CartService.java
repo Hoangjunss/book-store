@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 public interface CartService {
     CartDTO findById(Integer id);
     CartDTO findByUser();
-    CartDTO createCart(CartCreateDTO cartCreateDTO);
+    CartDTO createCart();
     CartDTO updateCart();
     boolean checkExistCart(Integer id);
 }

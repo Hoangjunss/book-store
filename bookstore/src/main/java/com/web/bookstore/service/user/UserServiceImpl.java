@@ -13,6 +13,7 @@ import com.web.bookstore.mapper.UserMapper;
 import com.web.bookstore.repository.user.UserRepository;
 import com.web.bookstore.service.JwtTokenUtil;
 import com.web.bookstore.service.OurUserDetailsService;
+import com.web.bookstore.service.cart.CartService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -38,6 +39,8 @@ public class UserServiceImpl implements UserService{
     private PasswordEncoder passwordEncoder;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private CartService cartService;
 
     @Autowired
     private OurUserDetailsService ourUserDetailsService;
@@ -56,6 +59,7 @@ public class UserServiceImpl implements UserService{
 
 
         user= userRepository.save(user);
+        cartService.createCart();
 
 
         UserDTO createUserResponse=userMapper.convertUserToCreateUserResponse(user);

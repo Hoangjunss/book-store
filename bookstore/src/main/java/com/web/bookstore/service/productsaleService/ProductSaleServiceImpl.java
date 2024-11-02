@@ -18,6 +18,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
+
 @Service
 
 public class ProductSaleServiceImpl implements ProductSaleService{
@@ -34,18 +36,7 @@ public class ProductSaleServiceImpl implements ProductSaleService{
     private ProductSaleMapper productSaleMapper;
     @Override
     public ProductSaleDTO createProductSale(ProductSaleCreateDTO createDTO) {
-        Optional<Warehouse> warehouseOptional = warehouseRepository.findByProductId(createDTO.getProductId());
-        if (!warehouseOptional.isPresent()) {
-            throw new RuntimeException("Product not found in warehouse");
-        }
-
-        Warehouse warehouse = warehouseOptional.get();
-        Product product = warehouse.getProduct();
-
-        // Check if there is enough quantity in warehouse
-        if (warehouse.getQuantity() < createDTO.getQuantity()) {
-            throw new RuntimeException("Insufficient quantity in warehouse");
-        }
+        Product product=productRepository.findById(createDTO.getProductId()).orElseThrow();
 
         // Use mapper to convert DTO to ProductSale entity
         ProductSale productSale = productSaleMapper.convertProductSaleCreateDtoToProductSale(createDTO, product);
@@ -53,9 +44,6 @@ public class ProductSaleServiceImpl implements ProductSaleService{
         // Save ProductSale to the database
         ProductSale savedProductSale = productSaleRepository.save(productSale);
 
-        // Update warehouse quantity
-        warehouse.setQuantity(warehouse.getQuantity() - createDTO.getQuantity());
-        warehouseRepository.save(warehouse);
 
         // Convert saved ProductSale to DTO and return
         ProductSaleDTO productSaleDTO = productSaleMapper.convertProductSaleToProductSaleDto(savedProductSale);
@@ -72,7 +60,7 @@ public class ProductSaleServiceImpl implements ProductSaleService{
         ProductSale existingProductSale = productSaleOptional.get();
 
         // Get Product from Warehouse based on productId
-        Optional<Warehouse> warehouseOptional = warehouseRepository.findByProductId(updateDTO.getProductId());
+        Optional<Warehouse> warehouseOptional = warehouseRepository.findById(updateDTO.getWarehouseId());
         if (!warehouseOptional.isPresent()) {
             throw new RuntimeException("Product not found in warehouse");
         }
@@ -139,6 +127,11 @@ public class ProductSaleServiceImpl implements ProductSaleService{
     public ProductSaleDTO findById(Integer id) {
         ProductSale productSale=productSaleRepository.findById(id).orElseThrow();
         return  productSaleMapper.convertProductSaleToProductSaleDto(productSale);
+    }
+    public Integer getGenerationId() {
+        UUID uuid = UUID.randomUUID();
+        // Use most significant bits and ensure it's within the integer range
+        return (int) (uuid.getMostSignificantBits() & 0xFFFFFFFFL);
     }
 
 }

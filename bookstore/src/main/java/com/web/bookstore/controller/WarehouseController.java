@@ -29,4 +29,26 @@ public class WarehouseController {
 
         return ResponseEntity.ok(warehouses);
     }
+    @GetMapping("/id")
+    public ResponseEntity<Page<WarehouseDTO>> getAllWarehousesByIdProduct(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam Integer idProduct) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<WarehouseDTO> warehouses = warehouseService.getIdProduct(pageable,idProduct);
+
+        return ResponseEntity.ok(warehouses);
+    }
+    @GetMapping("/idThan")
+    public ResponseEntity<Page<WarehouseDTO>> getAllWarehousesByIdProductThan(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam Integer idProduct) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<WarehouseDTO> warehouses = warehouseService.getIdProductThanQuantity(pageable,idProduct);
+
+        return ResponseEntity.ok(warehouses);
+    }
 }

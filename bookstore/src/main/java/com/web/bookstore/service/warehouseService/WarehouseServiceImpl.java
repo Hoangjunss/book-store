@@ -6,6 +6,7 @@ import com.web.bookstore.dto.warehouseDTO.warehouseDTO.WarehouseDTO;
 import com.web.bookstore.entity.product.Product;
 import com.web.bookstore.entity.warehouse.Warehouse;
 import com.web.bookstore.mapper.WarehouseMapper;
+import com.web.bookstore.repository.product.ProductRepository;
 import com.web.bookstore.repository.warehouse.WarehouseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,6 +25,8 @@ public class WarehouseServiceImpl implements WarehouseService{
 
     @Autowired
     private WarehouseMapper warehouseMapper;
+    @Autowired
+    private ProductRepository productRepository;
     @Override
     public void updateWarehouse(Product product, Integer quantity, BigDecimal unitPrice) {
 
@@ -47,6 +50,21 @@ public class WarehouseServiceImpl implements WarehouseService{
         // Map each Warehouse entity to WarehouseDTO and return as a Page
         return warehouses.map(warehouseMapper::conventWarehouseToWarehouseDTO);
     }
+
+    @Override
+    public Page<WarehouseDTO> getIdProduct(Pageable pageable, Integer id) {
+        Product product=productRepository.findById(id).orElseThrow();
+        Page<Warehouse> warehousePage=warehouseRepository.findAllByProduct(pageable,product);
+        return warehousePage.map(warehouseMapper::conventWarehouseToWarehouseDTO);
+    }
+
+    @Override
+    public Page<WarehouseDTO> getIdProductThanQuantity(Pageable pageable, Integer id) {
+        Product product=productRepository.findById(id).orElseThrow();
+        Page<Warehouse> warehousePage=warehouseRepository.findAllByProductAndQuantityGreaterThan(pageable,product,0);
+        return warehousePage.map(warehouseMapper::conventWarehouseToWarehouseDTO);
+    }
+
     public Integer getGenerationId() {
         UUID uuid = UUID.randomUUID();
         // Use most significant bits and ensure it's within the integer range

@@ -11,4 +11,6 @@ import java.math.BigDecimal;
 public interface WarehouseService {
     void updateWarehouse(Product product, Integer quantity, BigDecimal unitPrice);
     Page<WarehouseDTO> getList(Pageable pageable);
+    Page<WarehouseDTO> getIdProduct(Pageable pageable,Integer id);
+    Page<WarehouseDTO> getIdProductThanQuantity(Pageable pageable,Integer id);
 }
