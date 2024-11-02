@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class SupplyServiceImpl implements SupplyService {
@@ -26,7 +27,7 @@ public class SupplyServiceImpl implements SupplyService {
     public SupplyDTO createSupply(SupplyCreateDTO supplyCreateDTO) {
 
         Supply supply = supplyMapper.conventSupplyCreateDTOToSupply(supplyCreateDTO);
-
+        supply.setId(getGenerationId());
 
         Supply savedSupply = supplyRepository.save(supply);
 
@@ -84,5 +85,10 @@ public class SupplyServiceImpl implements SupplyService {
     public SupplyDTO findById(Integer id) {
         Supply supply=supplyRepository.findById(id).orElseThrow();
         return supplyMapper.conventSupplyToSupplyDTO(supply);
+    }
+    public Integer getGenerationId() {
+        UUID uuid = UUID.randomUUID();
+        // Use most significant bits and ensure it's within the integer range
+        return (int) (uuid.getMostSignificantBits() & 0xFFFFFFFFL);
     }
 }

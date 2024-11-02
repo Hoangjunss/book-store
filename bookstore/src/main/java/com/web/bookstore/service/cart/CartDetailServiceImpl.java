@@ -20,6 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -71,6 +72,7 @@ public class CartDetailServiceImpl implements CartDetailService{
         } else {
             // If CartDetail does not exist, create a new one
            cartDetail = cartDetailMapper.convertCartDetailCreateDTOToCartDetail(cartDetailCreateDTO, productSale, cart);
+           cartDetail.setId(getGenerationId());
         }
 
 
@@ -120,5 +122,10 @@ public class CartDetailServiceImpl implements CartDetailService{
                         () -> { throw new CustomException(Error.CARTDETAIL_NOT_FOUND); }
                 );
         cartService.updateCart();
+    }
+    public Integer getGenerationId() {
+        UUID uuid = UUID.randomUUID();
+        // Use most significant bits and ensure it's within the integer range
+        return (int) (uuid.getMostSignificantBits() & 0xFFFFFFFFL);
     }
 }

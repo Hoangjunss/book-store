@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -63,9 +64,15 @@ public class InvoiceDetailsServiceImpl implements InvoiceDetailsService{
                 .orElseThrow(()-> new CustomException(Error.PRODUCT_NOT_FOUND));
 
         InvoiceDetail invoiceDetail = invoiceDetailMapper.convertInvoiceDetailCreateDTOToInvoiceDetail(invoiceDetailCreateDTO, invoice, product);
+        invoiceDetail.setId(getGenerationId());
 
         return invoiceDetailMapper.convertInvoiceDetailToInvoiceDetailDTO(
                 invoiceDetailRepository.save(invoiceDetail)
         );
+    }
+    public Integer getGenerationId() {
+        UUID uuid = UUID.randomUUID();
+        // Use most significant bits and ensure it's within the integer range
+        return (int) (uuid.getMostSignificantBits() & 0xFFFFFFFFL);
     }
 }

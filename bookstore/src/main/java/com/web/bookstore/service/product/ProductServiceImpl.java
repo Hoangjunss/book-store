@@ -17,6 +17,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class ProductServiceImpl implements ProductService {
     @Autowired
@@ -34,6 +36,7 @@ public class ProductServiceImpl implements ProductService {
         Supply supply=supplyRepository.findById(productDTO.getSupplyId()).orElseThrow(()->new CustomException(Error.PRODUCT_NOT_FOUND));
         Category category=new Category();
         Product product=productMapper.conventProductCreateDTOToProduct(productDTO,category,image,supply);
+        product.setId(getGenerationId());
 
         return productMapper.conventProductToProductDTO(productRepository.save(product));
     }
@@ -107,5 +110,10 @@ public class ProductServiceImpl implements ProductService {
 
         // Map each Product entity to ProductDTO and return as a Page
         return products.map(productMapper::conventProductToProductDTO);
+    }
+    public Integer getGenerationId() {
+        UUID uuid = UUID.randomUUID();
+        // Use most significant bits and ensure it's within the integer range
+        return (int) (uuid.getMostSignificantBits() & 0xFFFFFFFFL);
     }
 }

@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -89,6 +90,7 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
 
         OrderDetail orderDetail = orderDetailsMapper.convertOrderDetailCreateDTOToOrderDetail(orderDetailCreateDTO, order, product);
         orderDetail.setTotalPrice(totalPrice);
+        orderDetail.setId(getGenerationId());
 
         OrderDetail savedOrderDetail = orderDetailsRepository.save(orderDetail);
         log.info("OrderDetail created with ID: {}", savedOrderDetail.getId());
@@ -133,5 +135,10 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
         log.info("OrderDetail updated with ID: {}", savedOrderDetail.getId());
         orderRepository.updateTotalPriceByOrderId(orderDetail.getOrders().getId());
         return orderDetailsMapper.convertOrderDetailToOrderDetailDTO(savedOrderDetail);
+    }
+    public Integer getGenerationId() {
+        UUID uuid = UUID.randomUUID();
+        // Use most significant bits and ensure it's within the integer range
+        return (int) (uuid.getMostSignificantBits() & 0xFFFFFFFFL);
     }
 }

@@ -21,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,6 +52,7 @@ public class InvoiceServiceImpl implements InvoiceService{
                 .orElseThrow(()-> new CustomException(Error.ADDRESS_NOT_FOUND));
 
         Invoice invoice = invoiceMapper.convertInvoiceCreateDTOToInvoice(invoiceCreateDTO);
+        invoice.setId(getGenerationId());
         Invoice invoice1=invoiceRepository.save(invoice);
         List<InvoiceDetailCreateDTO> invoiceDetailCreateDTOS=invoiceCreateDTO.getInvoiceCreateDTOS();
         List<InvoiceDetailDTO>invoiceDetailDTOS=invoiceDetailCreateDTOS.stream().map(invoiceDetailCreateDTO -> {
@@ -81,5 +83,10 @@ public class InvoiceServiceImpl implements InvoiceService{
       Invoice invoice=invoiceRepository.findById(id).orElseThrow();
         List<InvoiceDetailDTO> invoiceDetailDTOS=invoiceDetailsService.getAllInvoiceDetailByIdInvoice(invoice.getId());
         return invoiceMapper.convertInvoiceToInvoiceDTO(invoice,invoiceDetailDTOS);
+    }
+    public Integer getGenerationId() {
+        UUID uuid = UUID.randomUUID();
+        // Use most significant bits and ensure it's within the integer range
+        return (int) (uuid.getMostSignificantBits() & 0xFFFFFFFFL);
     }
 }

@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -56,14 +57,12 @@ public class CartServiceImpl implements CartService{
     }
 
     @Override
-    public CartDTO createCart(CartCreateDTO cartCreateDTO) {
-        log.info("Creating new cart for user: {}", cartCreateDTO.toString());
+    public CartDTO createCart() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
 
-        Cart cart = cartMapper.convertCartCreateDTOToCart(cartCreateDTO);
-        cart.setUser(user);
+        Cart cart = Cart.builder().id(getGenerationId()).price(0.0).quantity(0).user(user).build();
         List<CartDetail> cartDetails=new ArrayList<>();
         return cartMapper.convertCartToCartDTO(cartRepository.save(cart),cartDetails);
     }
@@ -87,5 +86,10 @@ public class CartServiceImpl implements CartService{
     public boolean checkExistCart(Integer id) {
         log.info("Checking if cart exists with id: {}", id);
         return cartRepository.existsById(id);
+    }
+    public Integer getGenerationId() {
+        UUID uuid = UUID.randomUUID();
+        // Use most significant bits and ensure it's within the integer range
+        return (int) (uuid.getMostSignificantBits() & 0xFFFFFFFFL);
     }
 }
