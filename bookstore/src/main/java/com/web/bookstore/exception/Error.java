@@ -25,6 +25,7 @@ public enum Error {
     USER_UNABLE_TO_SAVE(1003, "Unable to save user", HttpStatus.INTERNAL_SERVER_ERROR),
     USER_UNABLE_TO_UPDATE(1004, "Unable to update user", HttpStatus.INTERNAL_SERVER_ERROR),
     USER_UNABLE_TO_DELETE(1005, "Unable to delete user", HttpStatus.INTERNAL_SERVER_ERROR),
+    ACCOUNT_LOCKED(1006,"account locked",HttpStatus.INTERNAL_SERVER_ERROR),
         //Field User error
         USER_INVALID_EMAIL(1101, "Invalid email", HttpStatus.BAD_REQUEST),
         USER_INVALID_PASSWORD(1102, "Invalid password", HttpStatus.BAD_REQUEST),

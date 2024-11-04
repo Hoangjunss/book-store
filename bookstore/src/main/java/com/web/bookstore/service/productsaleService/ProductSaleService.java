@@ -13,4 +13,8 @@ public interface ProductSaleService {
     ProductSaleDTO updateProductSale(ProductSaleUpdateDTO updateDTO);
     Page<ProductSaleDTO> getAllProductSales(String title, Integer categoryId, Double saleStartPrice, Double saleEndPrice, Pageable pageable);
     ProductSaleDTO findById(Integer id);
+    Page<ProductSaleDTO> getAllProductSaleBySuplly(Integer Id,Pageable pageable);
+    void lockProductSale(Integer id);
+    void unLockProductSale(Integer id);
+    Page<ProductSaleDTO>getAll(Pageable pageable);
 }

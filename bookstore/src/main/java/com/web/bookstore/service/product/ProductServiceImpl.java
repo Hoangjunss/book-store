@@ -111,6 +111,21 @@ public class ProductServiceImpl implements ProductService {
         // Map each Product entity to ProductDTO and return as a Page
         return products.map(productMapper::conventProductToProductDTO);
     }
+
+    @Override
+    public Page<ProductDTO> getAllByCategory(Pageable pageable, Integer id) {
+        return null;
+    }
+
+    @Override
+    public Page<ProductDTO> getAllSupply(Pageable pageable, Integer integer) {
+       Supply supply=supplyRepository.findById(integer).orElseThrow();
+        Page<Product> products = productRepository.findAllBySupply(pageable,supply);
+
+        // Map each Product entity to ProductDTO and return as a Page
+        return products.map(productMapper::conventProductToProductDTO);
+    }
+
     public Integer getGenerationId() {
         UUID uuid = UUID.randomUUID();
         // Use most significant bits and ensure it's within the integer range
