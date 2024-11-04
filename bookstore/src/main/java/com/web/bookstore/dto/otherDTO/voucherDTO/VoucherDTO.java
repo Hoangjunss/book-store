@@ -20,6 +20,5 @@ public class VoucherDTO {
     private Float percent;
     private LocalDate startDate;
     private LocalDate endDate;
-    private List<Product> products;
-    private List<User> users;
+    private Boolean status;
 }
