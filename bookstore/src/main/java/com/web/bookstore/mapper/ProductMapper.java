@@ -14,18 +14,14 @@ import org.springframework.stereotype.Component;
 public class ProductMapper {
     @Autowired
     private ModelMapper modelMapper;
-    public Product conventProductCreateDTOToProduct(ProductCreateDTO productCreateDTO, Category category, Image image, Supply supply){
+    public Product conventProductCreateDTOToProduct(ProductCreateDTO productCreateDTO){
         Product product=modelMapper.map(productCreateDTO,Product.class);
-        product.setCategory(category);
-        product.setImage(image);
-        product.setSupply(supply);
+
         return product;
     }
-    public Product conventProductDTOToProduct(ProductDTO productDTO, Category category, Image image ,Supply supply){
+    public Product conventProductDTOToProduct(ProductDTO productDTO){
         Product product=modelMapper.map(productDTO,Product.class);
-        product.setCategory(category);
-        product.setImage(image);
-        product.setSupply(supply);
+
         return product;
     }
 
