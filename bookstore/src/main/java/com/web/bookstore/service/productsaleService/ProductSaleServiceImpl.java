@@ -3,20 +3,26 @@ package com.web.bookstore.service.productsaleService;
 import com.web.bookstore.dto.productDTO.productsaleDTO.ProductSaleCreateDTO;
 import com.web.bookstore.dto.productDTO.productsaleDTO.ProductSaleDTO;
 import com.web.bookstore.dto.productDTO.productsaleDTO.ProductSaleUpdateDTO;
+import com.web.bookstore.entity.RedisConstant;
 import com.web.bookstore.entity.product.Product;
 import com.web.bookstore.entity.product.ProductSale;
 import com.web.bookstore.entity.warehouse.Warehouse;
+import com.web.bookstore.mapper.ProductMapper;
 import com.web.bookstore.mapper.ProductSaleMapper;
 import com.web.bookstore.repository.product.ProductRepository;
 import com.web.bookstore.repository.product.ProductSaleRepository;
 import com.web.bookstore.repository.warehouse.WarehouseRepository;
+import com.web.bookstore.service.product.ProductService;
+import com.web.bookstore.service.redis.RedisService;
 import jakarta.persistence.criteria.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -34,138 +40,182 @@ public class ProductSaleServiceImpl implements ProductSaleService{
 
     @Autowired
     private ProductSaleMapper productSaleMapper;
+    @Autowired
+    private RedisService redisService;
+    @Autowired
+    private ProductMapper productMapper;
+    @Autowired
+    private ProductService productService;
     @Override
     public ProductSaleDTO createProductSale(ProductSaleCreateDTO createDTO) {
-        Product product=productRepository.findById(createDTO.getProductId()).orElseThrow();
-
-        // Use mapper to convert DTO to ProductSale entity
+        Product product =productMapper.conventProductDTOToProduct(productService.findById(createDTO.getProductId()));
+        // Convert DTO to ProductSale entity and save
         ProductSale productSale = productSaleMapper.convertProductSaleCreateDtoToProductSale(createDTO, product);
-
-        // Save ProductSale to the database
+        productSale.setId(getGenerationId());
         ProductSale savedProductSale = productSaleRepository.save(productSale);
 
-
-        // Convert saved ProductSale to DTO and return
+        // Convert to DTO and cache it in Redis
         ProductSaleDTO productSaleDTO = productSaleMapper.convertProductSaleToProductSaleDto(savedProductSale);
+        String productSaleKey = RedisConstant.PRODUCT_SALE + savedProductSale.getId();
+        redisService.set(productSaleKey, productSaleDTO);
+
+        // Add to the list of all product sales in Redis
+        redisService.hashSet(RedisConstant.LIST_PRODUCT_SALE, String.valueOf(productSaleDTO.getId()), productSaleDTO);
+
         return productSaleDTO;
     }
 
     @Override
     public ProductSaleDTO updateProductSale(ProductSaleUpdateDTO updateDTO) {
-        Optional<ProductSale> productSaleOptional = productSaleRepository.findById(updateDTO.getId());
-        if (!productSaleOptional.isPresent()) {
-            throw new RuntimeException("ProductSale not found");
-        }
+        ProductSale existingProductSale = productSaleRepository.findById(updateDTO.getId())
+                .orElseThrow(() -> new RuntimeException("ProductSale not found"));
 
-        ProductSale existingProductSale = productSaleOptional.get();
+        Warehouse warehouse = warehouseRepository.findById(updateDTO.getWarehouseId())
+                .orElseThrow(() -> new RuntimeException("Product not found in warehouse"));
 
-        // Get Product from Warehouse based on productId
-        Optional<Warehouse> warehouseOptional = warehouseRepository.findById(updateDTO.getWarehouseId());
-        if (!warehouseOptional.isPresent()) {
-            throw new RuntimeException("Product not found in warehouse");
-        }
-
-        Warehouse warehouse = warehouseOptional.get();
         Product product = warehouse.getProduct();
-
-        // Calculate quantity difference
         int quantityDifference = updateDTO.getQuantity() - existingProductSale.getQuantity();
 
-        // If quantity increased, check if enough quantity in warehouse
-        if (quantityDifference > 0) {
-            if (warehouse.getQuantity() < quantityDifference) {
-                throw new RuntimeException("Insufficient quantity in warehouse to update");
-            }
-            // Reduce warehouse quantity
-            warehouse.setQuantity(warehouse.getQuantity() - quantityDifference);
-        } else {
-            // Increase warehouse quantity
-            warehouse.setQuantity(warehouse.getQuantity() - quantityDifference); // quantityDifference is negative
+        // Update warehouse quantity based on change
+        if (quantityDifference > 0 && warehouse.getQuantity() < quantityDifference) {
+            throw new RuntimeException("Insufficient quantity in warehouse to update");
         }
+        warehouse.setQuantity(warehouse.getQuantity() - quantityDifference);
         warehouseRepository.save(warehouse);
 
-        // Use mapper to update ProductSale entity
+        // Update ProductSale and cache the updated ProductSaleDTO
         existingProductSale = productSaleMapper.convertProductSaleUpdateDtoToProductSale(updateDTO, product);
-        existingProductSale.setId(updateDTO.getId()); // Ensure the ID is set
-
-        // Save updated ProductSale to the database
         ProductSale savedProductSale = productSaleRepository.save(existingProductSale);
 
-        // Convert saved ProductSale to DTO and return
         ProductSaleDTO productSaleDTO = productSaleMapper.convertProductSaleToProductSaleDto(savedProductSale);
+        redisService.set(RedisConstant.PRODUCT_SALE + savedProductSale.getId(), productSaleDTO);
+        redisService.hashSet(RedisConstant.LIST_PRODUCT_SALE,String.valueOf(savedProductSale.getId()),productSaleDTO);
+
         return productSaleDTO;
     }
 
     @Override
     public Page<ProductSaleDTO> getAllProductSales(String title, Integer categoryId, Double saleStartPrice, Double saleEndPrice, Pageable pageable) {
-        Specification<ProductSale> spec = new Specification<ProductSale>() {
-            @Override
-            public Predicate toPredicate(Root<ProductSale> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-                Join<ProductSale, Product> product = root.join("product", JoinType.INNER);
-                Predicate p = cb.conjunction();
+        String cacheKey = RedisConstant.PRODUCT_SALE_LIST + title + categoryId + saleStartPrice + saleEndPrice + pageable.getPageNumber();
+        List<ProductSaleDTO> cachedList = redisService.hashGetAll(cacheKey, ProductSaleDTO.class);
 
-                // Add condition for `title` if provided
-                if (title != null && !title.isEmpty()) {
-                    p = cb.and(p, cb.like(cb.lower(product.get("title")), "%" + title.toLowerCase() + "%"));
-                }
+        if (!cachedList.isEmpty()) {
+            return new PageImpl<>(cachedList, pageable, cachedList.size());
+        }
 
-                // Add condition for `categoryId` if provided
-                if (categoryId != null && categoryId != 0) {
-                    p = cb.and(p, cb.equal(product.get("category").get("id"), categoryId));
-                }
+        Specification<ProductSale> spec = (root, query, cb) -> {
+            Join<ProductSale, Product> product = root.join("product", JoinType.INNER);
+            Predicate p = cb.conjunction();
 
-                // Add condition for `saleStartPrice` if provided
-                if (saleStartPrice != null) {
-                    p = cb.and(p, cb.greaterThanOrEqualTo(root.get("price"), saleStartPrice));
-                }
-
-                // Add condition for `saleEndPrice` if provided
-                if (saleEndPrice != null) {
-                    p = cb.and(p, cb.lessThanOrEqualTo(root.get("price"), saleEndPrice));
-                }
-
-                // Add condition for `status` to be `true`
-                p = cb.and(p, cb.isTrue(root.get("status")));
-
-                return p;
+            if (title != null && !title.isEmpty()) {
+                p = cb.and(p, cb.like(cb.lower(product.get("title")), "%" + title.toLowerCase() + "%"));
             }
+            if (categoryId != null && categoryId != 0) {
+                p = cb.and(p, cb.equal(product.get("category").get("id"), categoryId));
+            }
+            if (saleStartPrice != null) {
+                p = cb.and(p, cb.greaterThanOrEqualTo(root.get("price"), saleStartPrice));
+            }
+            if (saleEndPrice != null) {
+                p = cb.and(p, cb.lessThanOrEqualTo(root.get("price"), saleEndPrice));
+            }
+            return cb.and(p, cb.isTrue(root.get("status")));
         };
 
         Page<ProductSale> productSales = productSaleRepository.findAll(spec, pageable);
-        return productSales.map(productSaleMapper::convertProductSaleToProductSaleDto);
-    }
+        Page<ProductSaleDTO> productSaleDTOPage = productSales.map(productSaleMapper::convertProductSaleToProductSaleDto);
 
+        productSaleDTOPage.forEach(productSaleDTO ->
+                redisService.hashSet(cacheKey, String.valueOf(productSaleDTO.getId()), productSaleDTO)
+        );
+
+        return productSaleDTOPage;
+    }
 
     @Override
     public ProductSaleDTO findById(Integer id) {
-        ProductSale productSale=productSaleRepository.findById(id).orElseThrow();
-        return  productSaleMapper.convertProductSaleToProductSaleDto(productSale);
+        ProductSaleDTO cachedProductSale = (ProductSaleDTO) redisService.get(RedisConstant.PRODUCT_SALE + id);
+
+        if (cachedProductSale != null) {
+            return cachedProductSale;
+        }
+
+        ProductSale productSale = productSaleRepository.findById(id).orElseThrow();
+        ProductSaleDTO productSaleDTO = productSaleMapper.convertProductSaleToProductSaleDto(productSale);
+        redisService.set(RedisConstant.PRODUCT_SALE + id, productSaleDTO);
+        redisService.hashSet(RedisConstant.LIST_PRODUCT_SALE,String.valueOf(productSale.getId()),productSaleDTO);
+
+        return productSaleDTO;
     }
 
     @Override
-    public Page<ProductSaleDTO> getAllProductSaleBySuplly(Integer id,Pageable pageable) {
+    public Page<ProductSaleDTO> getAllProductSaleBySupply(Integer id, Pageable pageable) {
+        String cacheKey = RedisConstant.LIST_PRODUCT_SALE_SUPPLY  + id;
+        List<ProductSaleDTO> cachedList = redisService.hashGetAll(cacheKey, ProductSaleDTO.class);
+
+        if (!cachedList.isEmpty()) {
+            return new PageImpl<>(cachedList, pageable, cachedList.size());
+        }
+
         Page<ProductSale> productSales = productSaleRepository.findByProduct_Supply_Id(id, pageable);
-        return productSales.map(productSaleMapper::convertProductSaleToProductSaleDto);
+        Page<ProductSaleDTO> productSaleDTOPage = productSales.map(productSaleMapper::convertProductSaleToProductSaleDto);
+
+        productSaleDTOPage.forEach(productSaleDTO ->
+                redisService.hashSet(cacheKey, String.valueOf(productSaleDTO.getId()), productSaleDTO)
+        );
+
+        return productSaleDTOPage;
     }
 
     @Override
     public void lockProductSale(Integer id) {
-        ProductSale productSale=productSaleRepository.findById(id).orElseThrow();
+        ProductSale productSale = productSaleRepository.findById(id).orElseThrow();
         productSale.setStatus(false);
         productSaleRepository.save(productSale);
+
+        ProductSaleDTO productSaleDTO = productSaleMapper.convertProductSaleToProductSaleDto(productSale);
+        redisService.set(RedisConstant.PRODUCT_SALE + id, productSaleDTO);
+        if(redisService.exists(RedisConstant.LIST_PRODUCT_SALE_SUPPLY +productSale.getId())){
+            redisService.hashSet(RedisConstant.LIST_PRODUCT_SALE_SUPPLY +productSale.getId(),String.valueOf(productSaleDTO.getId()),productSaleDTO);
+        }
+        if(redisService.exists(RedisConstant.LIST_PRODUCT_SALE)){
+            redisService.hashSet(RedisConstant.LIST_PRODUCT_SALE,String.valueOf(productSaleDTO.getId()),productSaleDTO);
+        }
+
     }
 
     @Override
     public void unLockProductSale(Integer id) {
-        ProductSale productSale=productSaleRepository.findById(id).orElseThrow();
+        ProductSale productSale = productSaleRepository.findById(id).orElseThrow();
         productSale.setStatus(true);
         productSaleRepository.save(productSale);
+
+        ProductSaleDTO productSaleDTO = productSaleMapper.convertProductSaleToProductSaleDto(productSale);
+        redisService.set(RedisConstant.PRODUCT_SALE + id, productSaleDTO);
+        if(redisService.exists(RedisConstant.PRODUCT_SALE_SUPPLY+productSale.getId())){
+            redisService.hashSet(RedisConstant.PRODUCT_SALE_SUPPLY+productSale.getId(),String.valueOf(productSaleDTO.getId()),productSaleDTO);
+        }
+        if(redisService.exists(RedisConstant.LIST_PRODUCT_SALE)){
+            redisService.hashSet(RedisConstant.LIST_PRODUCT_SALE,String.valueOf(productSaleDTO.getId()),productSaleDTO);
+        }
     }
 
     @Override
     public Page<ProductSaleDTO> getAll(Pageable pageable) {
-       Page<ProductSale> productSales=productSaleRepository.findAll(pageable);
-        return productSales.map(productSaleMapper::convertProductSaleToProductSaleDto);
+        List<ProductSaleDTO> cachedList = redisService.hashGetAll(RedisConstant.LIST_PRODUCT_SALE, ProductSaleDTO.class);
+
+        if (!cachedList.isEmpty()) {
+            return new PageImpl<>(cachedList, pageable, cachedList.size());
+        }
+
+        Page<ProductSale> productSales = productSaleRepository.findAll(pageable);
+        Page<ProductSaleDTO> productSaleDTOPage = productSales.map(productSaleMapper::convertProductSaleToProductSaleDto);
+
+        productSaleDTOPage.forEach(productSaleDTO ->
+                redisService.hashSet(RedisConstant.LIST_PRODUCT_SALE, String.valueOf(productSaleDTO.getId()), productSaleDTO)
+        );
+
+        return productSaleDTOPage;
     }
 
     public Integer getGenerationId() {

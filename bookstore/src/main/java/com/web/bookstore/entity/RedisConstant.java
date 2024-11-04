@@ -6,6 +6,10 @@ public class RedisConstant {
     public static final String PRODUCT = "product";
     public static final String LIST_PRODUCT_STATUS = "listProductStatus";
     public static final String LIST_CATEGORY = "listCategory";
+    public static final String LIST_PRODUCT_SALE = "listProductSale";
+    public static final String PRODUCT_SALE = "prductSale";
+    public static final String LIST_PRODUCT_SALE_SUPPLY = "listProductSaleSupply";
+    public static final String PRODUCT_SALE_LIST = "productSaleList";
 
 
     public static final String CATEGORY = "category";

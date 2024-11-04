@@ -46,8 +46,11 @@ public class ProductServiceImpl implements ProductService {
         Image image=imageService.saveImage(productDTO.getImage());
         Supply supply=supplyMapper.conventSupplyDTOToSupply(supplyService.findById(productDTO.getSupplyId()));
         Category category=new Category();
-        Product product=productMapper.conventProductCreateDTOToProduct(productDTO,category,image,supply);
+        Product product=productMapper.conventProductCreateDTOToProduct(productDTO);
         product.setId(getGenerationId());
+        product.setCategory(category);
+        product.setImage(image);
+        product.setSupply(supply);
 
         ProductDTO productDTO1= productMapper.conventProductToProductDTO(productRepository.save(product));
         String productKey = RedisConstant.PRODUCT + productDTO1.getId();
