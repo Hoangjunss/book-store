@@ -18,4 +18,6 @@ public class OrdersUpdateDTO {
     private Integer quantity;
     private BigDecimal totalPrice;
     private AddressDTO address;
+    private String paymentStatus;
+    private String orderStatus;
 }

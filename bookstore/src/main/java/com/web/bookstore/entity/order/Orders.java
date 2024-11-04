@@ -1,6 +1,7 @@
 package com.web.bookstore.entity.order;
 
 import com.web.bookstore.entity.other.Address;
+import com.web.bookstore.entity.other.Payment;
 import com.web.bookstore.entity.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -28,4 +29,6 @@ public class Orders {
     private Address address;
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
+    @Enumerated(EnumType.STRING)
+    private Payment paymentStatus;
 }

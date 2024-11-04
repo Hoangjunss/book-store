@@ -35,6 +35,8 @@ public class OrdersMapper {
        OrdersDTO ordersDTO=modelMapper.map(orders, OrdersDTO.class);
        ordersDTO.setOrderDetailDTOS(orderDetailDTOS);
        ordersDTO.setUsername(orders.getUser().getUsername());
+       ordersDTO.setOrderStatus(orders.getOrderStatus().name());
+       ordersDTO.setPaymentStatus(orders.getPaymentStatus().name());
        return ordersDTO;
     }
 
