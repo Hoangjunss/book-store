@@ -149,15 +149,15 @@ public class ProductSaleServiceImpl implements ProductSaleService{
     }
 
     @Override
-    public Page<ProductSaleDTO> getAllProductSaleBySupply(Integer id, Pageable pageable) {
-        String cacheKey = RedisConstant.LIST_PRODUCT_SALE_SUPPLY  + id;
+    public Page<ProductSaleDTO> getAllProductSaleBySuplly(Integer Id, Pageable pageable) {
+        String cacheKey = RedisConstant.LIST_PRODUCT_SALE_SUPPLY  + Id;
         List<ProductSaleDTO> cachedList = redisService.hashGetAll(cacheKey, ProductSaleDTO.class);
 
         if (!cachedList.isEmpty()) {
             return new PageImpl<>(cachedList, pageable, cachedList.size());
         }
 
-        Page<ProductSale> productSales = productSaleRepository.findByProduct_Supply_Id(id, pageable);
+        Page<ProductSale> productSales = productSaleRepository.findByProduct_Supply_Id(Id, pageable);
         Page<ProductSaleDTO> productSaleDTOPage = productSales.map(productSaleMapper::convertProductSaleToProductSaleDto);
 
         productSaleDTOPage.forEach(productSaleDTO ->
@@ -166,6 +166,8 @@ public class ProductSaleServiceImpl implements ProductSaleService{
 
         return productSaleDTOPage;
     }
+
+
 
     @Override
     public void lockProductSale(Integer id) {
