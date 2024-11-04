@@ -6,6 +6,7 @@ import com.web.bookstore.dto.orderDTO.ordersDTO.OrdersDTO;
 import com.web.bookstore.entity.order.OrderStatus;
 import com.web.bookstore.entity.order.Orders;
 import com.web.bookstore.entity.other.Address;
+import com.web.bookstore.entity.other.Payment;
 import com.web.bookstore.entity.user.User;
 import com.web.bookstore.exception.CustomException;
 import com.web.bookstore.exception.Error;
@@ -86,6 +87,8 @@ public class OrdersServiceImpl implements OrdersService{
         orders.setUser(user);
         orders.setAddress(address);
         orders.setId(getGenerationId());
+        orders.setOrderStatus(OrderStatus.valueOf(ordersCreateDTO.getOrderStatus()));
+        orders.setPaymentStatus(Payment.valueOf(ordersCreateDTO.getPaymentStatus()));
         List<OrderDetailDTO> orderDetailDTOS=ordersCreateDTO.getOrderDetailCreateDTOS().stream().map(orderDetailCreateDTO -> orderDetailsService.create(orderDetailCreateDTO)).collect(Collectors.toList());
         return ordersMapper.convertOrdersToOrdersDTO(orderRepository.save(orders),orderDetailDTOS);
     }
