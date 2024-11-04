@@ -18,17 +18,15 @@ public class VoucherMapper {
     @Autowired
     private ModelMapper modelMapper;
 
-    public Voucher convertVoucherCreateDTOToVoucher(VoucherCreateDTO voucherCreateDTO, List<Product> products, List<User> users) {
+    public Voucher convertVoucherCreateDTOToVoucher(VoucherCreateDTO voucherCreateDTO) {
         Voucher voucher = modelMapper.map(voucherCreateDTO, Voucher.class);
-        voucher.setProducts(products);
-        voucher.setUsers(users);
+
         return voucher;
     }
 
-    public Voucher convertVoucherDTOToVoucher(VoucherDTO voucherDTO, List<Product> products, List<User> users) {
+    public Voucher convertVoucherDTOToVoucher(VoucherDTO voucherDTO) {
         Voucher voucher = modelMapper.map(voucherDTO, Voucher.class);
-        voucher.setProducts(products);
-        voucher.setUsers(users);
+
         return voucher;
     }
 

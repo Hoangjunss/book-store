@@ -23,10 +23,5 @@ public class Voucher {
     private Float percent;
     private LocalDate startDate;
     private LocalDate endDate;
-    @ManyToMany
-    @JoinTable
-    private List<Product> products;
-    @ManyToMany
-    @JoinTable
-    private List<User> users;
+    private Boolean status;
 }
