@@ -19,6 +19,8 @@ public class RedisConstant {
     public static final String USER_ID = "userId";
     public static final String USER_EMAIL = "userEmail";
     public static final String USER_ROLE = "userRole";
+    public static final String SUPPLY_ID = "supplyId";
+    public static final String LIST_SUPPLY = "supplyList";
 
 
     public static final String LIST_USER = "listUser";

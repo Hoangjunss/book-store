@@ -11,9 +11,11 @@ import com.web.bookstore.entity.user.Supply;
 import com.web.bookstore.exception.CustomException;
 import com.web.bookstore.exception.Error;
 import com.web.bookstore.mapper.ProductMapper;
+import com.web.bookstore.mapper.SupplyMapper;
 import com.web.bookstore.repository.product.ProductRepository;
 import com.web.bookstore.repository.user.SupplyRepository;
 import com.web.bookstore.service.redis.RedisService;
+import com.web.bookstore.service.supply.SupplyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -35,12 +37,14 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private ImageService imageService;
     @Autowired
-    private SupplyRepository supplyRepository;
+    private SupplyService supplyService;
+    @Autowired
+    private SupplyMapper supplyMapper;
 
     @Override
     public ProductDTO createProduct(ProductCreateDTO productDTO) {
         Image image=imageService.saveImage(productDTO.getImage());
-        Supply supply=supplyRepository.findById(productDTO.getSupplyId()).orElseThrow(()->new CustomException(Error.PRODUCT_NOT_FOUND));
+        Supply supply=supplyMapper.conventSupplyDTOToSupply(supplyService.findById(productDTO.getSupplyId()));
         Category category=new Category();
         Product product=productMapper.conventProductCreateDTOToProduct(productDTO,category,image,supply);
         product.setId(getGenerationId());
@@ -168,8 +172,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Page<ProductDTO> getAllSupply(Pageable pageable, Integer integer) {
-        Supply supply = supplyRepository.findById(integer).orElseThrow();
-
+        Supply supply = supplyMapper.conventSupplyDTOToSupply(supplyService.findById(integer));
         List<ProductDTO> cachedProducts = redisService.hashGetAll(RedisConstant.LIST_PRODUCT_All_SUPPLY+supply.getId(), ProductDTO.class);
 
         if (!cachedProducts.isEmpty()) {
