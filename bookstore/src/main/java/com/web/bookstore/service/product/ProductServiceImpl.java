@@ -138,7 +138,7 @@ public class ProductServiceImpl implements ProductService {
             return productDTO;
         }
     }
-    @Autowired
+    @Override
     public Page<ProductDTO> getAll(Pageable pageable) {
         List<ProductDTO> cachedProducts = redisService.hashGetAll(RedisConstant.LIST_PRODUCT_All, ProductDTO.class);
 
