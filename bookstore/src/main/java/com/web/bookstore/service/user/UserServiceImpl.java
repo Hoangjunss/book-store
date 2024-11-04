@@ -150,6 +150,7 @@ public class UserServiceImpl implements UserService{
         users.stream().map(user -> {
             redisService.set(RedisConstant.USER_ID+user.getId(),user);
             redisService.set(RedisConstant.USER_EMAIL+user.getUsername(),user);
+            return user;
         });
         // Cache each UserDTO in Redis under the role-based cache key
         userDTOPage.forEach(userDTO ->
