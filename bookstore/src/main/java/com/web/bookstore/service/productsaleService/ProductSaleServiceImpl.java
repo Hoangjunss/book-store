@@ -192,8 +192,8 @@ public class ProductSaleServiceImpl implements ProductSaleService{
 
         ProductSaleDTO productSaleDTO = productSaleMapper.convertProductSaleToProductSaleDto(productSale);
         redisService.set(RedisConstant.PRODUCT_SALE + id, productSaleDTO);
-        if(redisService.exists(RedisConstant.PRODUCT_SALE_SUPPLY+productSale.getId())){
-            redisService.hashSet(RedisConstant.PRODUCT_SALE_SUPPLY+productSale.getId(),String.valueOf(productSaleDTO.getId()),productSaleDTO);
+        if(redisService.exists(RedisConstant.LIST_PRODUCT_SALE_SUPPLY+productSale.getId())){
+            redisService.hashSet(RedisConstant.LIST_PRODUCT_SALE_SUPPLY+productSale.getId(),String.valueOf(productSaleDTO.getId()),productSaleDTO);
         }
         if(redisService.exists(RedisConstant.LIST_PRODUCT_SALE)){
             redisService.hashSet(RedisConstant.LIST_PRODUCT_SALE,String.valueOf(productSaleDTO.getId()),productSaleDTO);
