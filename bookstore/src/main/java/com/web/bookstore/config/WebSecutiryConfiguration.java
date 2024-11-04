@@ -43,13 +43,9 @@ private JwtAuthenticationFilter jwtAuthenticationFilter;
 
                 // Configure các luồng truy cập
                 .authorizeHttpRequests((auth) -> auth.requestMatchers("/users/register","/users/signin","/user/refreshtoken","/image",
-                                "/warehouses",
-                                "/warehouses/*",
-                                "/warehouse-receipts",
-                                "/warehouse-receipts/*",
+
                                 "/productsales",
                                 "/productsales/*",
-                                "/orders",
                                 "/product",
                                 "/product/*").permitAll()
                     // Xác thực tất cả các request
