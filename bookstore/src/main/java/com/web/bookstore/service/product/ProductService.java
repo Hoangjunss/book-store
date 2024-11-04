@@ -11,4 +11,6 @@ public interface ProductService {
     void deleteProduct(Integer id);
     ProductDTO findById(Integer id);
     Page<ProductDTO>getAll(Pageable pageable);
+    Page<ProductDTO>getAllByCategory(Pageable pageable,Integer id);
+    Page<ProductDTO>getAllSupply(Pageable pageable,Integer integer);
 }

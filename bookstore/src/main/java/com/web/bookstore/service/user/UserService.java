@@ -16,4 +16,6 @@ public interface UserService {
     AuthenticationDTO signIn(UserLoginDTO user);
     AuthenticationDTO generateRefreshToken(String token);
     Page<UserDTO> getRole(String role, Pageable pageable);
+
+    void lock(Integer integer);
 }

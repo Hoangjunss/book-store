@@ -46,4 +46,9 @@ public class UserController {
        Page<UserDTO> userDTOS=userService.getRole(role,pageable);
         return new ResponseEntity<>(userDTOS, HttpStatus.OK);
     }
+    @PostMapping("/lock")
+    public ResponseEntity<?>lock(@RequestParam Integer integer){
+        userService.lock(integer);
+        return ResponseEntity.ok("lock user");
+    }
 }

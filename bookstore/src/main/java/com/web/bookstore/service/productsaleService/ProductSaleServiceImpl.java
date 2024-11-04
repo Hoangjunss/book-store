@@ -103,18 +103,30 @@ public class ProductSaleServiceImpl implements ProductSaleService{
             public Predicate toPredicate(Root<ProductSale> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
                 Join<ProductSale, Product> product = root.join("product", JoinType.INNER);
                 Predicate p = cb.conjunction();
+
+                // Add condition for `title` if provided
                 if (title != null && !title.isEmpty()) {
                     p = cb.and(p, cb.like(cb.lower(product.get("title")), "%" + title.toLowerCase() + "%"));
                 }
+
+                // Add condition for `categoryId` if provided
                 if (categoryId != null && categoryId != 0) {
                     p = cb.and(p, cb.equal(product.get("category").get("id"), categoryId));
                 }
+
+                // Add condition for `saleStartPrice` if provided
                 if (saleStartPrice != null) {
                     p = cb.and(p, cb.greaterThanOrEqualTo(root.get("price"), saleStartPrice));
                 }
+
+                // Add condition for `saleEndPrice` if provided
                 if (saleEndPrice != null) {
                     p = cb.and(p, cb.lessThanOrEqualTo(root.get("price"), saleEndPrice));
                 }
+
+                // Add condition for `status` to be `true`
+                p = cb.and(p, cb.isTrue(root.get("status")));
+
                 return p;
             }
         };
@@ -123,11 +135,39 @@ public class ProductSaleServiceImpl implements ProductSaleService{
         return productSales.map(productSaleMapper::convertProductSaleToProductSaleDto);
     }
 
+
     @Override
     public ProductSaleDTO findById(Integer id) {
         ProductSale productSale=productSaleRepository.findById(id).orElseThrow();
         return  productSaleMapper.convertProductSaleToProductSaleDto(productSale);
     }
+
+    @Override
+    public Page<ProductSaleDTO> getAllProductSaleBySuplly(Integer id,Pageable pageable) {
+        Page<ProductSale> productSales = productSaleRepository.findByProduct_Supply_Id(id, pageable);
+        return productSales.map(productSaleMapper::convertProductSaleToProductSaleDto);
+    }
+
+    @Override
+    public void lockProductSale(Integer id) {
+        ProductSale productSale=productSaleRepository.findById(id).orElseThrow();
+        productSale.setStatus(false);
+        productSaleRepository.save(productSale);
+    }
+
+    @Override
+    public void unLockProductSale(Integer id) {
+        ProductSale productSale=productSaleRepository.findById(id).orElseThrow();
+        productSale.setStatus(true);
+        productSaleRepository.save(productSale);
+    }
+
+    @Override
+    public Page<ProductSaleDTO> getAll(Pageable pageable) {
+       Page<ProductSale> productSales=productSaleRepository.findAll(pageable);
+        return productSales.map(productSaleMapper::convertProductSaleToProductSaleDto);
+    }
+
     public Integer getGenerationId() {
         UUID uuid = UUID.randomUUID();
         // Use most significant bits and ensure it's within the integer range

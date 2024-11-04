@@ -28,6 +28,7 @@ public class User implements UserDetails {
     @ManyToOne
     @JoinColumn
     private Role role;
+    private Boolean locked;
 
 
     @Override
@@ -53,7 +54,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return UserDetails.super.isAccountNonLocked();
+        return!locked;
     }
 
     @Override

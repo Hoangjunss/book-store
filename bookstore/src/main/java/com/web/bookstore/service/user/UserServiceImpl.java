@@ -79,7 +79,11 @@ public class UserServiceImpl implements UserService{
 
 
 
+
         User userFind = userRepository.findByUsername(name).orElseThrow();
+        if (!userFind.isAccountNonLocked()) {
+            throw new CustomJwtException(Error.ACCOUNT_LOCKED);
+        }
         if (!passwordEncoder.matches(user.getPassword(), userFind.getPassword())) {
             throw new CustomJwtException(Error.NOT_FOUND);
         }
@@ -112,6 +116,13 @@ public class UserServiceImpl implements UserService{
 
         Page<User> users= userRepository.findAllByRole(role1,pageable);
       return users.map(userMapper::convertUserToCreateUserResponse);
+    }
+
+    @Override
+    public void lock(Integer integer) {
+        User user=userRepository.findById(integer).orElseThrow();
+        user.setLocked(true);
+        userRepository.save(user);
     }
 
     private boolean usernameExists(String username) {
