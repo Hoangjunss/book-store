@@ -40,8 +40,7 @@ public class ProductSaleServiceImpl implements ProductSaleService{
 
     @Autowired
     private ProductSaleMapper productSaleMapper;
-    @Autowired
-    private RedisService redisService;
+
     @Autowired
     private ProductMapper productMapper;
     @Autowired
@@ -57,10 +56,9 @@ public class ProductSaleServiceImpl implements ProductSaleService{
         // Convert to DTO and cache it in Redis
         ProductSaleDTO productSaleDTO = productSaleMapper.convertProductSaleToProductSaleDto(savedProductSale);
         String productSaleKey = RedisConstant.PRODUCT_SALE + savedProductSale.getId();
-        redisService.set(productSaleKey, productSaleDTO);
+
 
         // Add to the list of all product sales in Redis
-        redisService.hashSet(RedisConstant.LIST_PRODUCT_SALE, String.valueOf(productSaleDTO.getId()), productSaleDTO);
 
         return productSaleDTO;
     }
@@ -88,8 +86,7 @@ public class ProductSaleServiceImpl implements ProductSaleService{
         ProductSale savedProductSale = productSaleRepository.save(existingProductSale);
 
         ProductSaleDTO productSaleDTO = productSaleMapper.convertProductSaleToProductSaleDto(savedProductSale);
-        redisService.set(RedisConstant.PRODUCT_SALE + savedProductSale.getId(), productSaleDTO);
-        redisService.hashSet(RedisConstant.LIST_PRODUCT_SALE,String.valueOf(savedProductSale.getId()),productSaleDTO);
+
 
         return productSaleDTO;
     }
@@ -97,11 +94,7 @@ public class ProductSaleServiceImpl implements ProductSaleService{
     @Override
     public Page<ProductSaleDTO> getAllProductSales(String title, Integer categoryId, Double saleStartPrice, Double saleEndPrice, Pageable pageable) {
         String cacheKey = RedisConstant.PRODUCT_SALE_LIST + title + categoryId + saleStartPrice + saleEndPrice + pageable.getPageNumber();
-        List<ProductSaleDTO> cachedList = redisService.hashGetAll(cacheKey, ProductSaleDTO.class);
 
-        if (!cachedList.isEmpty()) {
-            return new PageImpl<>(cachedList, pageable, cachedList.size());
-        }
 
         Specification<ProductSale> spec = (root, query, cb) -> {
             Join<ProductSale, Product> product = root.join("product", JoinType.INNER);
@@ -125,25 +118,17 @@ public class ProductSaleServiceImpl implements ProductSaleService{
         Page<ProductSale> productSales = productSaleRepository.findAll(spec, pageable);
         Page<ProductSaleDTO> productSaleDTOPage = productSales.map(productSaleMapper::convertProductSaleToProductSaleDto);
 
-        productSaleDTOPage.forEach(productSaleDTO ->
-                redisService.hashSet(cacheKey, String.valueOf(productSaleDTO.getId()), productSaleDTO)
-        );
+
 
         return productSaleDTOPage;
     }
 
     @Override
     public ProductSaleDTO findById(Integer id) {
-        ProductSaleDTO cachedProductSale = (ProductSaleDTO) redisService.get(RedisConstant.PRODUCT_SALE + id);
 
-        if (cachedProductSale != null) {
-            return cachedProductSale;
-        }
 
         ProductSale productSale = productSaleRepository.findById(id).orElseThrow();
         ProductSaleDTO productSaleDTO = productSaleMapper.convertProductSaleToProductSaleDto(productSale);
-        redisService.set(RedisConstant.PRODUCT_SALE + id, productSaleDTO);
-        redisService.hashSet(RedisConstant.LIST_PRODUCT_SALE,String.valueOf(productSale.getId()),productSaleDTO);
 
         return productSaleDTO;
     }
@@ -151,18 +136,12 @@ public class ProductSaleServiceImpl implements ProductSaleService{
     @Override
     public Page<ProductSaleDTO> getAllProductSaleBySuplly(Integer Id, Pageable pageable) {
         String cacheKey = RedisConstant.LIST_PRODUCT_SALE_SUPPLY  + Id;
-        List<ProductSaleDTO> cachedList = redisService.hashGetAll(cacheKey, ProductSaleDTO.class);
 
-        if (!cachedList.isEmpty()) {
-            return new PageImpl<>(cachedList, pageable, cachedList.size());
-        }
 
         Page<ProductSale> productSales = productSaleRepository.findByProduct_Supply_Id(Id, pageable);
         Page<ProductSaleDTO> productSaleDTOPage = productSales.map(productSaleMapper::convertProductSaleToProductSaleDto);
 
-        productSaleDTOPage.forEach(productSaleDTO ->
-                redisService.hashSet(cacheKey, String.valueOf(productSaleDTO.getId()), productSaleDTO)
-        );
+
 
         return productSaleDTOPage;
     }
@@ -176,13 +155,7 @@ public class ProductSaleServiceImpl implements ProductSaleService{
         productSaleRepository.save(productSale);
 
         ProductSaleDTO productSaleDTO = productSaleMapper.convertProductSaleToProductSaleDto(productSale);
-        redisService.set(RedisConstant.PRODUCT_SALE + id, productSaleDTO);
-        if(redisService.exists(RedisConstant.LIST_PRODUCT_SALE_SUPPLY +productSale.getId())){
-            redisService.hashSet(RedisConstant.LIST_PRODUCT_SALE_SUPPLY +productSale.getId(),String.valueOf(productSaleDTO.getId()),productSaleDTO);
-        }
-        if(redisService.exists(RedisConstant.LIST_PRODUCT_SALE)){
-            redisService.hashSet(RedisConstant.LIST_PRODUCT_SALE,String.valueOf(productSaleDTO.getId()),productSaleDTO);
-        }
+
 
     }
 
@@ -193,29 +166,17 @@ public class ProductSaleServiceImpl implements ProductSaleService{
         productSaleRepository.save(productSale);
 
         ProductSaleDTO productSaleDTO = productSaleMapper.convertProductSaleToProductSaleDto(productSale);
-        redisService.set(RedisConstant.PRODUCT_SALE + id, productSaleDTO);
-        if(redisService.exists(RedisConstant.LIST_PRODUCT_SALE_SUPPLY+productSale.getId())){
-            redisService.hashSet(RedisConstant.LIST_PRODUCT_SALE_SUPPLY+productSale.getId(),String.valueOf(productSaleDTO.getId()),productSaleDTO);
-        }
-        if(redisService.exists(RedisConstant.LIST_PRODUCT_SALE)){
-            redisService.hashSet(RedisConstant.LIST_PRODUCT_SALE,String.valueOf(productSaleDTO.getId()),productSaleDTO);
-        }
+
     }
 
     @Override
     public Page<ProductSaleDTO> getAll(Pageable pageable) {
-        List<ProductSaleDTO> cachedList = redisService.hashGetAll(RedisConstant.LIST_PRODUCT_SALE, ProductSaleDTO.class);
 
-        if (!cachedList.isEmpty()) {
-            return new PageImpl<>(cachedList, pageable, cachedList.size());
-        }
 
         Page<ProductSale> productSales = productSaleRepository.findAll(pageable);
         Page<ProductSaleDTO> productSaleDTOPage = productSales.map(productSaleMapper::convertProductSaleToProductSaleDto);
 
-        productSaleDTOPage.forEach(productSaleDTO ->
-                redisService.hashSet(RedisConstant.LIST_PRODUCT_SALE, String.valueOf(productSaleDTO.getId()), productSaleDTO)
-        );
+
 
         return productSaleDTOPage;
     }
