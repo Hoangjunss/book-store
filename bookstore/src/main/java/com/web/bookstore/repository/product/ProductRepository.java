@@ -1,6 +1,7 @@
 package com.web.bookstore.repository.product;
 
 import com.web.bookstore.dto.productDTO.productDTO.ProductDTO;
+import com.web.bookstore.entity.product.Category;
 import com.web.bookstore.entity.product.Product;
 import com.web.bookstore.entity.user.Supply;
 import org.springframework.data.domain.Page;
@@ -10,4 +11,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface ProductRepository extends JpaRepository<Product,Integer>, JpaSpecificationExecutor<Product> {
     Page<Product> findAllBySupply(Pageable pageable,Supply supply);
+    Page<Product>findAllByCategory(Pageable pageable, Category category);
 }

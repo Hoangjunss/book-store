@@ -33,8 +33,7 @@ public class UserServiceImpl implements UserService{
 
     @Autowired
     private UserMapper userMapper;
-    @Autowired
-    private RedisService redisService;
+
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
     @Autowired
@@ -61,12 +60,12 @@ public class UserServiceImpl implements UserService{
         }
         user.setId(getGenerationId());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-
+        user.setLocked(true);
 
 
         user= userRepository.save(user);
-        cartService.createCart();
-        redisService.set(RedisConstant.USER_ID+user.getId(),user);
+        cartService.createCart(user);
+
 
 
         UserDTO createUserResponse=userMapper.convertUserToCreateUserResponse(user);
@@ -79,17 +78,12 @@ public class UserServiceImpl implements UserService{
         String name = userDTO.getName().trim().toLowerCase();
 
         // Check if the user data is already cached in Redis
-        User userFind = (User) redisService.get(RedisConstant.USER_EMAIL + name);
 
-        if (userFind == null) {
             // If not cached, retrieve the user from the database
-            userFind = userRepository.findByUsername(name)
+          User  userFind = userRepository.findByUsername(name)
                     .orElseThrow(() -> new CustomJwtException(Error.USER_NOT_FOUND));
 
-            // Cache the retrieved user in Redis
-            redisService.set(RedisConstant.USER_EMAIL + name, userFind);
-            redisService.set(RedisConstant.USER_ID+userFind.getId(),userFind);
-        }
+
 
         // Check if the account is locked
         if (!userFind.isAccountNonLocked()) {
@@ -134,12 +128,6 @@ public class UserServiceImpl implements UserService{
         String cacheKey = RedisConstant.USER_ROLE + role;
 
         // Attempt to retrieve cached users for this role from Redis
-        List<UserDTO> cachedUsers = redisService.hashGetAll(cacheKey, UserDTO.class);
-
-        if (!cachedUsers.isEmpty()) {
-            // If cached data is found, return it as a Page
-            return new PageImpl<>(cachedUsers, pageable, cachedUsers.size());
-        }
 
         // If no cached data, retrieve users with the specified role from the database
         Role roleEntity = roleService.findByName(role);
@@ -147,40 +135,53 @@ public class UserServiceImpl implements UserService{
 
         // Map users to UserDTO
         Page<UserDTO> userDTOPage = users.map(userMapper::convertUserToCreateUserResponse);
-        users.stream().map(user -> {
-            redisService.set(RedisConstant.USER_ID+user.getId(),user);
-            redisService.set(RedisConstant.USER_EMAIL+user.getUsername(),user);
-            return user;
-        });
+
         // Cache each UserDTO in Redis under the role-based cache key
-        userDTOPage.forEach(userDTO ->
-                redisService.hashSet(cacheKey, String.valueOf(userDTO.getId()), userDTO)
-        );
+
 
         // Return the paginated result
         return userDTOPage;
     }
 
     @Override
+    public Page<UserDTO> findByName(String name, Pageable pageable) {
+        Page<User> users;
+        if (name != null && !name.trim().isEmpty()) {
+            users = userRepository.findByUsernameContainingIgnoreCase(name, pageable);
+        } else {
+            users = userRepository.findAll(pageable);
+        }
+        return users.map(userMapper::convertUserToCreateUserResponse);
+    }
+
+    @Override
     public void lock(Integer userId) {
         String userCacheKey = RedisConstant.USER_ID + userId;
 
-        // Attempt to retrieve the user from Redis first
-        User user = (User) redisService.get(userCacheKey);
 
-        if (user == null) {
+
+
             // If not cached, retrieve from the database
-            user = userRepository.findById(userId)
+         User   user = userRepository.findById(userId)
                     .orElseThrow(() -> new CustomException(Error.USER_NOT_FOUND));
-        }
+
 
         // Set user as locked and save to the database
         user.setLocked(true);
         userRepository.save(user);
 
         // Update the Redis cache with the locked user
-        redisService.set(userCacheKey, user);
-        redisService.set(RedisConstant.USER_EMAIL+user.getUsername(),user);
+
+    }
+
+    @Override
+    public UserDTO updateUser(UserDTO userDTO) {
+        User user=userRepository.findById(userDTO.getId()).orElseThrow();
+        user.setFullname(user.getFullname());
+        user.setEmail(user.getEmail());
+        user.setUsername(user.getUsername());
+        userRepository.save(user);
+        return userMapper.convertUserToCreateUserResponse(user);
     }
 
     private boolean usernameExists(String username) {

@@ -57,10 +57,9 @@ public class CartServiceImpl implements CartService{
     }
 
     @Override
-    public CartDTO createCart() {
+    public CartDTO createCart(User user) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) authentication.getPrincipal();
+
 
         Cart cart = Cart.builder().id(getGenerationId()).price(0.0).quantity(0).user(user).build();
         List<CartDetail> cartDetails=new ArrayList<>();

@@ -27,7 +27,7 @@ public class Product {
     @OneToOne
     @JoinColumn
     private Image image;
-    private LocalDate datePublic;
+
     private String size;
     @ManyToOne
     @JoinColumn

@@ -12,6 +12,7 @@ import com.web.bookstore.exception.CustomException;
 import com.web.bookstore.exception.Error;
 import com.web.bookstore.mapper.ProductMapper;
 import com.web.bookstore.mapper.SupplyMapper;
+import com.web.bookstore.repository.product.CategoryRepository;
 import com.web.bookstore.repository.product.ProductRepository;
 import com.web.bookstore.repository.user.SupplyRepository;
 import com.web.bookstore.service.redis.RedisService;
@@ -30,10 +31,11 @@ import java.util.UUID;
 public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductRepository productRepository;
-    @Autowired
-    private RedisService redisService;
+
     @Autowired
     private ProductMapper productMapper;
+    @Autowired
+    private CategoryRepository categoryRepository;
     @Autowired
     private ImageService imageService;
     @Autowired
@@ -54,10 +56,7 @@ public class ProductServiceImpl implements ProductService {
 
         ProductDTO productDTO1= productMapper.conventProductToProductDTO(productRepository.save(product));
         String productKey = RedisConstant.PRODUCT + productDTO1.getId();
-        redisService.set(productKey, productDTO1);
 
-        // Add the product to the list of products in Redis
-        redisService.hashSet(RedisConstant.LIST_PRODUCT_All, String.valueOf(productDTO1.getId()), productDTO1);
         return productDTO1;
     }
 
@@ -119,12 +118,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDTO findById(Integer id) {
-        ProductDTO cachedProduct=(ProductDTO) redisService.get(RedisConstant.PRODUCT+id);
 
-        if (cachedProduct != null) {
-            // Return cached product
-            return cachedProduct;
-        } else {
             // Retrieve the product from the database if not in cache
             Product product = productRepository.findById(id)
                     .orElseThrow();
@@ -133,19 +127,14 @@ public class ProductServiceImpl implements ProductService {
             ProductDTO productDTO = productMapper.conventProductToProductDTO(product);
 
             // Cache the ProductDTO in Redis
-            redisService.set(RedisConstant.PRODUCT + id, productDTO);
+
 
             return productDTO;
-        }
+
     }
     @Override
     public Page<ProductDTO> getAll(Pageable pageable) {
-        List<ProductDTO> cachedProducts = redisService.hashGetAll(RedisConstant.LIST_PRODUCT_All, ProductDTO.class);
 
-        if (!cachedProducts.isEmpty()) {
-            // Return cached data as a Page object
-            return new PageImpl<>(cachedProducts, pageable, cachedProducts.size());
-        } else {
             // Retrieve paginated Product entities from the database
             Page<Product> products = productRepository.findAll(pageable);
 
@@ -153,35 +142,23 @@ public class ProductServiceImpl implements ProductService {
             Page<ProductDTO> productDTOPage = products.map(productMapper::conventProductToProductDTO);
 
             // Store the retrieved ProductDTOs in Redis
-            productDTOPage.forEach(productDTO -> {
-                        redisService.hashSet(RedisConstant.LIST_PRODUCT_All, String.valueOf(productDTO.getId()), productDTO);
-                        if (!redisService.exists(RedisConstant.PRODUCT + productDTO.getId())) {
-                            redisService.set(RedisConstant.PRODUCT + productDTO.getId(), productDTO);
-                        }
-                    }
-            );
-
-            // Optionally, set expiration time for caching
-            redisService.setTimeToLive(RedisConstant.LIST_PRODUCT_All, 1); // Set TTL as needed
 
             return productDTOPage;
-        }
+
     }
 
     @Override
     public Page<ProductDTO> getAllByCategory(Pageable pageable, Integer id) {
-        return null;
+        Category category=categoryRepository.findById(id).orElseThrow();
+        Page<Product> products=productRepository.findAllByCategory(pageable,category);
+        return products.map(productMapper::conventProductToProductDTO);
     }
 
     @Override
     public Page<ProductDTO> getAllSupply(Pageable pageable, Integer integer) {
         Supply supply = supplyMapper.conventSupplyDTOToSupply(supplyService.findById(integer));
-        List<ProductDTO> cachedProducts = redisService.hashGetAll(RedisConstant.LIST_PRODUCT_All_SUPPLY+supply.getId(), ProductDTO.class);
 
-        if (!cachedProducts.isEmpty()) {
-            // Return cached data as a Page object
-            return new PageImpl<>(cachedProducts, pageable, cachedProducts.size());
-        } else {
+
             // Retrieve paginated Product entities from the database
             Page<Product> products = productRepository.findAllBySupply(pageable, supply);
 
@@ -189,19 +166,10 @@ public class ProductServiceImpl implements ProductService {
             Page<ProductDTO> productDTOPage = products.map(productMapper::conventProductToProductDTO);
 
             // Store the retrieved ProductDTOs in Redis
-            productDTOPage.forEach(productDTO -> {
-                        redisService.hashSet(RedisConstant.LIST_PRODUCT_All, String.valueOf(productDTO.getId()), productDTO);
-                if (!redisService.exists(RedisConstant.PRODUCT + productDTO.getId())) {
-                    redisService.set(RedisConstant.PRODUCT + productDTO.getId(), productDTO);
-                }
-                    }
-            );
 
-            // Optionally, set expiration time for caching
-            redisService.setTimeToLive(RedisConstant.LIST_PRODUCT_All_SUPPLY+supply.getId(), 1); // Set TTL as needed
 
             return productDTOPage;
-        }
+
     }
 
     public Integer getGenerationId() {

@@ -1,11 +1,14 @@
 package com.web.bookstore.service.supply;
 
+import com.web.bookstore.dto.otherDTO.addressDTO.AddressDTO;
 import com.web.bookstore.dto.productDTO.supplyDTO.SupplyCreateDTO;
 import com.web.bookstore.dto.productDTO.supplyDTO.SupplyDTO;
 import com.web.bookstore.entity.RedisConstant;
 import com.web.bookstore.entity.user.Supply;
+import com.web.bookstore.mapper.AddressMapper;
 import com.web.bookstore.mapper.SupplyMapper;
 import com.web.bookstore.repository.user.SupplyRepository;
+import com.web.bookstore.service.other.AddressService;
 import com.web.bookstore.service.redis.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -26,21 +29,23 @@ public class SupplyServiceImpl implements SupplyService {
     @Autowired
     private SupplyMapper supplyMapper;
     @Autowired
-    private RedisService redisService;
+    private AddressService addressService;
+    @Autowired
+    private AddressMapper addressMapper;
+
 
     @Override
     public SupplyDTO createSupply(SupplyCreateDTO supplyCreateDTO) {
         Supply supply = supplyMapper.conventSupplyCreateDTOToSupply(supplyCreateDTO);
         supply.setId(getGenerationId());
-
+        AddressDTO addressDTO=addressService.createAddress(supplyCreateDTO.getAddressCreateDTO());
+        supply.setAddress(addressMapper.convertAddressDTOToAddress(addressDTO));
         Supply savedSupply = supplyRepository.save(supply);
         SupplyDTO savedSupplyDTO = supplyMapper.conventSupplyToSupplyDTO(savedSupply);
 
-        // Cache the newly created supply by ID
-        redisService.set(RedisConstant.SUPPLY_ID + savedSupply.getId(), savedSupplyDTO);
 
-        // Add the new supply to the cached list
-        redisService.hashSet(RedisConstant.LIST_SUPPLY, String.valueOf(savedSupply.getId()), savedSupplyDTO);
+
+
 
         return savedSupplyDTO;
     }
@@ -61,11 +66,6 @@ public class SupplyServiceImpl implements SupplyService {
         Supply savedSupply = supplyRepository.save(updatedSupply);
         SupplyDTO savedSupplyDTO = supplyMapper.conventSupplyToSupplyDTO(savedSupply);
 
-        // Update the supply in Redis cache by ID
-        redisService.set(RedisConstant.SUPPLY_ID + savedSupply.getId(), savedSupplyDTO);
-
-        // Update the supply in the cached list
-        redisService.hashSet(RedisConstant.LIST_SUPPLY, String.valueOf(savedSupply.getId()), savedSupplyDTO);
 
         return savedSupplyDTO;
     }
@@ -85,10 +85,6 @@ public class SupplyServiceImpl implements SupplyService {
         SupplyDTO deletedSupplyDTO = supplyMapper.conventSupplyToSupplyDTO(savedSupply);
 
         // Remove the supply from Redis cache by ID
-        redisService.delete(RedisConstant.SUPPLY_ID + id);
-
-        // Remove the supply from the cached list
-        redisService.delete(RedisConstant.LIST_SUPPLY, String.valueOf(id));
 
         return deletedSupplyDTO;
     }
@@ -97,21 +93,14 @@ public class SupplyServiceImpl implements SupplyService {
     public Page<SupplyDTO> getList(Pageable pageable) {
         // Use the cache key to represent the specific page in the list
         String cacheKey = RedisConstant.LIST_SUPPLY + pageable.getPageNumber() + "-" + pageable.getPageSize();
-        List<SupplyDTO> cachedSupplyList = redisService.hashGetAll(cacheKey, SupplyDTO.class);
 
-        if (!cachedSupplyList.isEmpty()) {
-            // Return cached supplies as a Page
-            return new PageImpl<>(cachedSupplyList, pageable, cachedSupplyList.size());
-        }
 
         // Retrieve supplies with pagination from the database if not cached
         Page<Supply> supplies = supplyRepository.findAll(pageable);
         Page<SupplyDTO> supplyDTOPage = supplies.map(supplyMapper::conventSupplyToSupplyDTO);
 
         // Cache each SupplyDTO in Redis under the list key for pagination
-        supplyDTOPage.forEach(supplyDTO ->
-                redisService.hashSet(cacheKey, String.valueOf(supplyDTO.getId()), supplyDTO)
-        );
+
 
         return supplyDTOPage;
     }
@@ -119,19 +108,14 @@ public class SupplyServiceImpl implements SupplyService {
     @Override
     public SupplyDTO findById(Integer id) {
         // Attempt to retrieve the supply from Redis cache by ID
-        SupplyDTO cachedSupply = (SupplyDTO) redisService.get(RedisConstant.SUPPLY_ID + id);
 
-        if (cachedSupply != null) {
-            return cachedSupply;
-        }
 
         // Retrieve supply from the database if not cached
         Supply supply = supplyRepository.findById(id).orElseThrow(() -> new RuntimeException("Supply not found"));
         SupplyDTO supplyDTO = supplyMapper.conventSupplyToSupplyDTO(supply);
 
         // Cache the retrieved supply by ID and in the list
-        redisService.set(RedisConstant.SUPPLY_ID + id, supplyDTO);
-        redisService.hashSet(RedisConstant.LIST_SUPPLY, String.valueOf(supplyDTO.getId()), supplyDTO);
+
 
         return supplyDTO;
     }
