@@ -60,11 +60,11 @@ public class UserServiceImpl implements UserService{
         }
         user.setId(getGenerationId());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-
+        user.setLocked(true);
 
 
         user= userRepository.save(user);
-        cartService.createCart();
+        cartService.createCart(user);
 
 
 
@@ -144,6 +144,17 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    public Page<UserDTO> findByName(String name, Pageable pageable) {
+        Page<User> users;
+        if (name != null && !name.trim().isEmpty()) {
+            users = userRepository.findByUsernameContainingIgnoreCase(name, pageable);
+        } else {
+            users = userRepository.findAll(pageable);
+        }
+        return users.map(userMapper::convertUserToCreateUserResponse);
+    }
+
+    @Override
     public void lock(Integer userId) {
         String userCacheKey = RedisConstant.USER_ID + userId;
 
@@ -161,6 +172,16 @@ public class UserServiceImpl implements UserService{
 
         // Update the Redis cache with the locked user
 
+    }
+
+    @Override
+    public UserDTO updateUser(UserDTO userDTO) {
+        User user=userRepository.findById(userDTO.getId()).orElseThrow();
+        user.setFullname(user.getFullname());
+        user.setEmail(user.getEmail());
+        user.setUsername(user.getUsername());
+        userRepository.save(user);
+        return userMapper.convertUserToCreateUserResponse(user);
     }
 
     private boolean usernameExists(String username) {

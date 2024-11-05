@@ -12,6 +12,7 @@ import com.web.bookstore.exception.CustomException;
 import com.web.bookstore.exception.Error;
 import com.web.bookstore.mapper.ProductMapper;
 import com.web.bookstore.mapper.SupplyMapper;
+import com.web.bookstore.repository.product.CategoryRepository;
 import com.web.bookstore.repository.product.ProductRepository;
 import com.web.bookstore.repository.user.SupplyRepository;
 import com.web.bookstore.service.redis.RedisService;
@@ -33,6 +34,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private ProductMapper productMapper;
+    @Autowired
+    private CategoryRepository categoryRepository;
     @Autowired
     private ImageService imageService;
     @Autowired
@@ -146,7 +149,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Page<ProductDTO> getAllByCategory(Pageable pageable, Integer id) {
-        return null;
+        Category category=categoryRepository.findById(id).orElseThrow();
+        Page<Product> products=productRepository.findAllByCategory(pageable,category);
+        return products.map(productMapper::conventProductToProductDTO);
     }
 
     @Override

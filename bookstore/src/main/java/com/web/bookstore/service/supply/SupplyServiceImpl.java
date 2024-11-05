@@ -1,11 +1,14 @@
 package com.web.bookstore.service.supply;
 
+import com.web.bookstore.dto.otherDTO.addressDTO.AddressDTO;
 import com.web.bookstore.dto.productDTO.supplyDTO.SupplyCreateDTO;
 import com.web.bookstore.dto.productDTO.supplyDTO.SupplyDTO;
 import com.web.bookstore.entity.RedisConstant;
 import com.web.bookstore.entity.user.Supply;
+import com.web.bookstore.mapper.AddressMapper;
 import com.web.bookstore.mapper.SupplyMapper;
 import com.web.bookstore.repository.user.SupplyRepository;
+import com.web.bookstore.service.other.AddressService;
 import com.web.bookstore.service.redis.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,13 +28,18 @@ public class SupplyServiceImpl implements SupplyService {
 
     @Autowired
     private SupplyMapper supplyMapper;
+    @Autowired
+    private AddressService addressService;
+    @Autowired
+    private AddressMapper addressMapper;
 
 
     @Override
     public SupplyDTO createSupply(SupplyCreateDTO supplyCreateDTO) {
         Supply supply = supplyMapper.conventSupplyCreateDTOToSupply(supplyCreateDTO);
         supply.setId(getGenerationId());
-
+        AddressDTO addressDTO=addressService.createAddress(supplyCreateDTO.getAddressCreateDTO());
+        supply.setAddress(addressMapper.convertAddressDTOToAddress(addressDTO));
         Supply savedSupply = supplyRepository.save(supply);
         SupplyDTO savedSupplyDTO = supplyMapper.conventSupplyToSupplyDTO(savedSupply);
 
