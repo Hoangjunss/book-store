@@ -51,7 +51,7 @@ public class UserController {
         userService.lock(integer);
         return ResponseEntity.ok("lock user");
     }
-    @GetMapping("search")
+    @GetMapping("/search")
     public ResponseEntity<Page<UserDTO>>getSearch(@RequestParam String search, @RequestParam(defaultValue = "0") int page,
                                                 @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);

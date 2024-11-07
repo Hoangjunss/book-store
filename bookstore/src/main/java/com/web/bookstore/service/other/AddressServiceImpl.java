@@ -6,7 +6,9 @@ import com.web.bookstore.entity.other.Address;
 import com.web.bookstore.mapper.AddressMapper;
 import com.web.bookstore.repository.other.AddressRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class AddressServiceImpl implements AddressService {
     @Autowired
     private AddressMapper addressMapper;

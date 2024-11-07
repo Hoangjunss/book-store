@@ -47,7 +47,12 @@ private JwtAuthenticationFilter jwtAuthenticationFilter;
                                 "/productsales",
                                 "/productsales/*",
                                 "/product",
-                                "/product/*").permitAll()
+                                "/product/*",
+                                "/users",
+                                "/users/*",
+                                "/category",
+                                "/supplies",
+                                "/supplies/*").permitAll()
                     // Xác thực tất cả các request
                         .anyRequest()
                         .authenticated()

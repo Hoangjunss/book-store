@@ -47,7 +47,8 @@ public class ProductServiceImpl implements ProductService {
     public ProductDTO createProduct(ProductCreateDTO productDTO) {
         Image image=imageService.saveImage(productDTO.getImage());
         Supply supply=supplyMapper.conventSupplyDTOToSupply(supplyService.findById(productDTO.getSupplyId()));
-        Category category=new Category();
+        Category category= categoryRepository.findById(productDTO.getCategoryId()).orElseThrow();
+
         Product product=productMapper.conventProductCreateDTOToProduct(productDTO);
         product.setId(getGenerationId());
         product.setCategory(category);
