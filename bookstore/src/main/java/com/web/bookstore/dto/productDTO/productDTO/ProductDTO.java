@@ -22,4 +22,6 @@ public class ProductDTO {
     private String size;
     private String supply;
     private Boolean status;
+    private Integer quantity;
+    private Double price;
 }

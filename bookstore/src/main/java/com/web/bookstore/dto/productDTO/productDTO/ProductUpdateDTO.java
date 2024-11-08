@@ -24,4 +24,6 @@ public class ProductUpdateDTO {
     private String size;
     private Integer supplyId;
     private Boolean status;
+    private Integer quantity;
+    private Double price;
 }

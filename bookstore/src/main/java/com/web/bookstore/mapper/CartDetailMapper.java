@@ -5,7 +5,7 @@ import com.web.bookstore.dto.cartDTO.cartdetailDTO.CartDetailDTO;
 import com.web.bookstore.dto.cartDTO.cartdetailDTO.CartDetailUpdateDTO;
 import com.web.bookstore.entity.cart.CartDetail;
 import com.web.bookstore.entity.cart.Cart;
-import com.web.bookstore.entity.product.ProductSale;
+import com.web.bookstore.entity.product.Product;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,16 +19,16 @@ public class CartDetailMapper {
     @Autowired
     private ModelMapper modelMapper;
 
-    public CartDetail convertCartDetailCreateDTOToCartDetail(CartDetailCreateDTO cartDetailCreateDTO, ProductSale productSale, Cart cart) {
+    public CartDetail convertCartDetailCreateDTOToCartDetail(CartDetailCreateDTO cartDetailCreateDTO, Product product, Cart cart) {
         CartDetail cartDetail = modelMapper.map(cartDetailCreateDTO, CartDetail.class);
-        cartDetail.setProductSale(productSale);
+        cartDetail.setProduct(product);
         cartDetail.setCart(cart);
         return cartDetail;
     }
 
-    public CartDetail convertCartDetailUpdateDTOToCartDetail(CartDetailUpdateDTO cartDetailUpdateDTO, ProductSale productSale, Cart cart) {
+    public CartDetail convertCartDetailUpdateDTOToCartDetail(CartDetailUpdateDTO cartDetailUpdateDTO, Product product, Cart cart) {
         CartDetail cartDetail = modelMapper.map(cartDetailUpdateDTO, CartDetail.class);
-        cartDetail.setProductSale(productSale);
+        cartDetail.setProduct(product);
         cartDetail.setCart(cart);
         return cartDetail;
     }

@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -42,6 +43,36 @@ public class ProductServiceImpl implements ProductService {
     private SupplyService supplyService;
     @Autowired
     private SupplyMapper supplyMapper;
+    @Override
+    public Page<ProductDTO> searchProducts(String name, String author, Integer categoryId,
+                                           Double minPrice, Double maxPrice, Pageable pageable) {
+        Specification<Product> specification = Specification.where((root, query, criteriaBuilder) ->
+                criteriaBuilder.equal(root.get("status"), true)
+        );
+
+        if (name != null) {
+            specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.like(root.get("name"), "%" + name + "%"));
+        }
+        if (author != null) {
+            specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.like(root.get("author"), "%" + author + "%"));
+        }
+        if (categoryId != null) {
+            specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("category").get("id"), categoryId));
+        }
+        if (minPrice != null && maxPrice != null) {
+            specification = specification.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.between(root.get("price"), minPrice, maxPrice));
+        } else if (minPrice != null) {
+            specification = specification.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.greaterThanOrEqualTo(root.get("price"), minPrice));
+        } else if (maxPrice != null) {
+            specification = specification.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.lessThanOrEqualTo(root.get("price"), maxPrice));
+        }
+
+        Page<Product> products = productRepository.findAll(specification, pageable);
+        return products.map(productMapper::conventProductToProductDTO);
+    }
 
     @Override
     public ProductDTO createProduct(ProductCreateDTO productDTO) {

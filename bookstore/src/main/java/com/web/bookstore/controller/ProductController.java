@@ -32,13 +32,21 @@ public class ProductController {
         return  ResponseEntity.ok("delete success full");
     }
     @PreAuthorize("permitAll()")
+
+
     @GetMapping
     public ResponseEntity<Page<ProductDTO>> getAllProducts(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String author,
+            @RequestParam(required = false) Integer categoryId,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice) {
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<ProductDTO> products = productService.getAll(pageable);
+        Page<ProductDTO> products = productService.searchProducts(
+                name, author, categoryId, minPrice, maxPrice, pageable);
 
         return ResponseEntity.ok(products);
     }

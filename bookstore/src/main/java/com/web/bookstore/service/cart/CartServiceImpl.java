@@ -74,7 +74,7 @@ public class CartServiceImpl implements CartService{
         List<CartDetail >cartDetails=cartDetailRepository.findByCart(cart);
         Integer quantity=cartDetails.stream().mapToInt(CartDetail::getQuantity).sum();
         Double total=cartDetails.stream()
-                .mapToDouble(cartDetail->cartDetail.getQuantity()*cartDetail.getProductSale().getPrice())
+                .mapToDouble(cartDetail->cartDetail.getQuantity()*cartDetail.getProduct().getPrice())
                 .sum();
         cart.setQuantity(quantity);
         cart.setPrice(total);

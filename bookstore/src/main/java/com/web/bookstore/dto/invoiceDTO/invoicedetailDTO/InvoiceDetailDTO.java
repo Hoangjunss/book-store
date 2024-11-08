@@ -2,7 +2,6 @@ package com.web.bookstore.dto.invoiceDTO.invoicedetailDTO;
 
 import com.web.bookstore.dto.productDTO.productDTO.ProductDTO;
 import com.web.bookstore.entity.invoice.Invoice;
-import com.web.bookstore.entity.product.Product;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

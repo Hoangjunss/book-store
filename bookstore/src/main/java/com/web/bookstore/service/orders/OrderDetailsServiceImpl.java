@@ -6,14 +6,13 @@ import com.web.bookstore.dto.orderDTO.orderdetailDTO.OrderDetailUpdateDTO;
 import com.web.bookstore.entity.order.OrderDetail;
 import com.web.bookstore.entity.order.Orders;
 import com.web.bookstore.entity.product.Product;
-import com.web.bookstore.entity.product.ProductSale;
 import com.web.bookstore.exception.CustomException;
 import com.web.bookstore.exception.Error;
 import com.web.bookstore.mapper.OrderDetailMapper;
 import com.web.bookstore.repository.order.OrderDetailRepository;
 import com.web.bookstore.repository.order.OrderRepository;
 import com.web.bookstore.repository.product.ProductRepository;
-import com.web.bookstore.repository.product.ProductSaleRepository;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,8 +36,7 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
     @Autowired
     private ProductRepository productRepository;
 
-    @Autowired
-    private ProductSaleRepository productSaleRepository;
+
 
 
     @Override
@@ -71,13 +69,13 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
         Product product = productRepository.findById(orderDetailCreateDTO.getProductId())
                 .orElseThrow(() -> new CustomException(Error.PRODUCT_NOT_FOUND));
 
-        ProductSale productSale = productSaleRepository.findByProduct(product);
+
 
         if (orderDetailCreateDTO.getQuantity() <= 0 ) {
             throw new CustomException(Error.ORDERDETAIL_INVALID_QUANTITY);
         }
 
-        if(orderDetailCreateDTO.getQuantity() > productSale.getQuantity()){
+        if(orderDetailCreateDTO.getQuantity() > product.getQuantity()){
             throw new CustomException(Error.ORDERDETAIL_INVALID_PRODUCTSALE);
         }
 
@@ -111,13 +109,13 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
         Product product = productRepository.findById(orderDetailUpdateDTO.getProductId())
                 .orElseThrow(() -> new CustomException(Error.PRODUCT_NOT_FOUND));
 
-        ProductSale productSale = productSaleRepository.findByProduct(product);
+
 
         if (orderDetailUpdateDTO.getQuantity() <= 0 ) {
             throw new CustomException(Error.ORDERDETAIL_INVALID_QUANTITY);
         }
 
-        if(orderDetailUpdateDTO.getQuantity() > productSale.getQuantity()){
+        if(orderDetailUpdateDTO.getQuantity() > product.getQuantity()){
             throw new CustomException(Error.ORDERDETAIL_INVALID_PRODUCTSALE);
         }
 

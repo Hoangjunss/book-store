@@ -1,8 +1,7 @@
 package com.web.bookstore.dto.cartDTO.cartdetailDTO;
 
-import com.web.bookstore.dto.productDTO.productsaleDTO.ProductSaleDTO;
-import com.web.bookstore.entity.cart.Cart;
-import com.web.bookstore.entity.product.ProductSale;
+import com.web.bookstore.dto.productDTO.productDTO.ProductDTO;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,5 +14,5 @@ import lombok.NoArgsConstructor;
 public class CartDetailDTO {
     private Integer id;
     private Integer quantity;
-    private ProductSaleDTO product;
+    private ProductDTO product;
 }

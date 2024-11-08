@@ -5,14 +5,15 @@ import com.web.bookstore.dto.cartDTO.cartdetailDTO.CartDetailDTO;
 import com.web.bookstore.dto.cartDTO.cartdetailDTO.CartDetailUpdateDTO;
 import com.web.bookstore.entity.cart.Cart;
 import com.web.bookstore.entity.cart.CartDetail;
-import com.web.bookstore.entity.product.ProductSale;
+import com.web.bookstore.entity.product.Product;
 import com.web.bookstore.entity.user.User;
 import com.web.bookstore.exception.CustomException;
 import com.web.bookstore.exception.Error;
 import com.web.bookstore.mapper.CartDetailMapper;
 import com.web.bookstore.repository.cart.CartDetailRepository;
 import com.web.bookstore.repository.cart.CartRepository;
-import com.web.bookstore.repository.product.ProductSaleRepository;
+import com.web.bookstore.repository.product.ProductRepository;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -33,9 +34,9 @@ public class CartDetailServiceImpl implements CartDetailService{
 
     @Autowired
     private CartDetailRepository cartDetailRepository;
+@Autowired
+private ProductRepository productRepository;
 
-    @Autowired
-    private ProductSaleRepository productSaleRepository;
     @Autowired
     private CartService cartService;
 
@@ -56,7 +57,7 @@ public class CartDetailServiceImpl implements CartDetailService{
         log.info("Create cart detail: {}", cartDetailCreateDTO.toString());
 
 
-        ProductSale productSale = productSaleRepository.findById(cartDetailCreateDTO.getProductSaleId())
+        Product productSale = productRepository.findById(cartDetailCreateDTO.getProductSaleId())
                 .orElseThrow(()-> new CustomException(Error.PRODUCTSALE_NOT_FOUND));
         if(cartDetailCreateDTO.getQuantity() > productSale.getQuantity()){
             throw new CustomException(Error.CARTDETAIL_INVALID_QUANTITY);
@@ -65,7 +66,7 @@ public class CartDetailServiceImpl implements CartDetailService{
         User user = (User) authentication.getPrincipal();
 
         Cart cart = cartRepository.findCartByUser(user);
-        CartDetail cartDetail=cartDetailRepository.findByCartAndProductSale(cart,productSale);
+        CartDetail cartDetail=cartDetailRepository.findByCartAndProduct(cart,productSale);
         if (cartDetail != null) {
             // If the CartDetail exists, update the quantity
             cartDetail.setQuantity(cartDetail.getQuantity() + cartDetailCreateDTO.getQuantity());
@@ -103,7 +104,7 @@ public class CartDetailServiceImpl implements CartDetailService{
     public CartDetailDTO updateCartDetail(CartDetailUpdateDTO cartDetailUpdateDTO) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
-        ProductSale productSale=productSaleRepository.findById(cartDetailUpdateDTO.getProductSaleId()).orElseThrow();
+        Product productSale=productRepository.findById(cartDetailUpdateDTO.getProductSaleId()).orElseThrow();
         Cart cart=cartRepository.findCartByUser(user);
 
         CartDetail cartDetail = cartDetailMapper.convertCartDetailUpdateDTOToCartDetail(cartDetailUpdateDTO, productSale, cart);

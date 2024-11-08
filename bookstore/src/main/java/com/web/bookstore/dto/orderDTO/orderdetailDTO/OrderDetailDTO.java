@@ -1,8 +1,6 @@
 package com.web.bookstore.dto.orderDTO.orderdetailDTO;
 
 import com.web.bookstore.dto.productDTO.productDTO.ProductDTO;
-import com.web.bookstore.entity.order.Orders;
-import com.web.bookstore.entity.product.Product;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -23,4 +23,6 @@ public class ProductCreateDTO {
     private String size;
     private Integer supplyId;
     private Boolean status;
+    private Integer quantity;
+    private Double price;
 }

@@ -1,6 +1,6 @@
 package com.web.bookstore.entity.cart;
 
-import com.web.bookstore.entity.product.ProductSale;
+import com.web.bookstore.entity.product.Product;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -21,7 +21,7 @@ public class CartDetail {
     private Integer quantity;
     @ManyToOne
     @JoinColumn
-    private ProductSale productSale;
+    private Product product;
     @ManyToOne
     @JoinColumn
     private Cart cart;

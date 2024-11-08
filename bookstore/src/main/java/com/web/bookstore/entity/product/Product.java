@@ -7,8 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-
 @Data
 @Builder
 @AllArgsConstructor
@@ -33,4 +31,6 @@ public class Product {
     @JoinColumn
     private Supply supply;
     private Boolean status;
+    private Integer quantity;
+    private Double price;
 }
