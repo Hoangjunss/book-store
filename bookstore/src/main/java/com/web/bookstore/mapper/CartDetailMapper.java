@@ -18,6 +18,8 @@ public class CartDetailMapper {
 
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private ProductMapper productMapper;
 
     public CartDetail convertCartDetailCreateDTOToCartDetail(CartDetailCreateDTO cartDetailCreateDTO, Product product, Cart cart) {
         CartDetail cartDetail = modelMapper.map(cartDetailCreateDTO, CartDetail.class);
@@ -34,7 +36,11 @@ public class CartDetailMapper {
     }
 
     public CartDetailDTO convertCartDetailToCartDetailDTO(CartDetail cartDetail) {
-        return modelMapper.map(cartDetail, CartDetailDTO.class);
+        return CartDetailDTO.builder()
+                .id(cartDetail.getId())
+                .quantity(cartDetail.getQuantity())
+                .product(productMapper.conventProductToProductDTO(cartDetail.getProduct()))
+                .build();
     }
 
     public List<CartDetailDTO> convertCartDetailListToCartDetailDTOList(List<CartDetail> cartDetails) {
