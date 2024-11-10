@@ -26,7 +26,7 @@ public class VoucherController {
 
     // Soft delete a supply by setting its status to false
     @DeleteMapping()
-    public ResponseEntity<?> deleteSupply(@RequestParam Integer id) {
+    public ResponseEntity<?> deleteVoucher(@RequestParam Integer id) {
       voucherService.deleteVoucher(id);
         return ResponseEntity.ok("delete");
     }

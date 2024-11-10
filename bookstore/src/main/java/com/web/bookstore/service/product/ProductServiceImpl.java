@@ -17,6 +17,7 @@ import com.web.bookstore.repository.product.ProductRepository;
 import com.web.bookstore.repository.user.SupplyRepository;
 import com.web.bookstore.service.redis.RedisService;
 import com.web.bookstore.service.supply.SupplyService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -25,6 +26,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 
@@ -93,50 +95,70 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public ProductDTO updateProduct(ProductCreateDTO productDTO) {
         // Retrieve the existing product
         Product existingProduct = productRepository.findById(productDTO.getId())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        // Flag to check if any changes have been made
-
-
-        // Check and update category if different
+        // Update Category if changed
         if (!existingProduct.getCategory().getId().equals(productDTO.getCategoryId())) {
-            existingProduct.getCategory().setId(productDTO.getCategoryId());
-
+            Category newCategory = categoryRepository.findById(productDTO.getCategoryId())
+                    .orElseThrow(() -> new RuntimeException("Category not found"));
+            existingProduct.setCategory(newCategory);
         }
 
-        // Check and update image if different
-        if (productDTO.getImage()!=null) {
-            Image image=imageService.saveImage(productDTO.getImage());
-            existingProduct.setImage(image);
-
-        }
-
-        // Check and update supply if different
+        // Update Supply if changed
         if (!existingProduct.getSupply().getId().equals(productDTO.getSupplyId())) {
-            existingProduct.getSupply().setId(productDTO.getSupplyId());
-
+            Supply newSupply=supplyMapper.conventSupplyDTOToSupply(supplyService.findById(productDTO.getSupplyId()));
+            existingProduct.setSupply(newSupply);
         }
 
-        // Check and update other product attributes
+        // Update Image if provided
+        if (productDTO.getImage() != null && !productDTO.getImage().isEmpty()) {
+            Image image = imageService.saveImage(productDTO.getImage());
+            existingProduct.setImage(image);
+        }
+
+        // Update other product attributes
         if (!existingProduct.getName().equals(productDTO.getName())) {
             existingProduct.setName(productDTO.getName());
-
         }
 
         if (!existingProduct.getDescription().equals(productDTO.getDescription())) {
             existingProduct.setDescription(productDTO.getDescription());
-
         }
 
-        // Save only if changes are detected
+        if (!existingProduct.getAuthor().equals(productDTO.getAuthor())) {
+            existingProduct.setAuthor(productDTO.getAuthor());
+        }
 
-            existingProduct = productRepository.save(existingProduct);
+        if (!existingProduct.getPage().equals(productDTO.getPage())) {
+            existingProduct.setPage(productDTO.getPage());
+        }
+
+        if (!Objects.equals(existingProduct.getSize(), productDTO.getSize())) {
+            existingProduct.setSize(productDTO.getSize());
+        }
+
+        if (!Objects.equals(existingProduct.getStatus(), productDTO.getStatus())) {
+            existingProduct.setStatus(productDTO.getStatus());
+        }
+
+        if (!Objects.equals(existingProduct.getQuantity(), productDTO.getQuantity())) {
+            existingProduct.setQuantity(productDTO.getQuantity());
+        }
+
+        if (!Objects.equals(existingProduct.getPrice(), productDTO.getPrice())) {
+            existingProduct.setPrice(productDTO.getPrice());
+        }
+
+        // Save the updated product
+        existingProduct = productRepository.save(existingProduct);
 
         return productMapper.conventProductToProductDTO(existingProduct);
     }
+
 
 
     @Override

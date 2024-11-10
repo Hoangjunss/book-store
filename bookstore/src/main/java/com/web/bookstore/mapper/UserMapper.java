@@ -29,6 +29,7 @@ public class UserMapper {
                .fullname(user.getFullname())
                .username(user.getUsername())
                .role(user.getRole().getRole())
+               .locked(user.getLocked())
                .build();
         return createUserResponse;
     }

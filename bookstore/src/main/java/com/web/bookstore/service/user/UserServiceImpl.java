@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService{
         }
         user.setId(getGenerationId());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setLocked(true);
+        user.setLocked(false);
 
 
         user= userRepository.save(user);
@@ -167,7 +167,7 @@ public class UserServiceImpl implements UserService{
 
 
         // Set user as locked and save to the database
-        user.setLocked(true);
+        user.setLocked(!user.getLocked());
         userRepository.save(user);
 
         // Update the Redis cache with the locked user

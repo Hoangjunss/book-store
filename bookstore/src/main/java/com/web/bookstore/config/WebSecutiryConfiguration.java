@@ -38,18 +38,14 @@ private JwtAuthenticationFilter jwtAuthenticationFilter;
             CorsConfigurationSource corsConfigurationSource) throws Exception {
 
         http
-                // Loại bỏ bảo vệ CSRF
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(AbstractHttpConfigurer::disable)
-
-                // Configure các luồng truy cập
                 .authorizeHttpRequests((auth) -> auth.requestMatchers("/users/register","/users/signin","/user/refreshtoken","/image",
 
                                 "/productsales",
                                 "/productsales/*",
                                 "/product",
                                 "/product/*",
-                                "/users",
-                                "/users/*",
                                 "/category",
                                 "/supplies",
                                 "/supplies/*").permitAll()

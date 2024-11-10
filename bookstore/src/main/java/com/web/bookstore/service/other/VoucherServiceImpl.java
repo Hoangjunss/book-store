@@ -10,6 +10,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class VoucherServiceImpl implements VoucherService{
     @Autowired
@@ -18,6 +20,7 @@ public class VoucherServiceImpl implements VoucherService{
     private VoucherRepository voucherRepository;
     @Override
     public VoucherDTO createVoucher(VoucherCreateDTO voucherCreateDTO) {
+        voucherCreateDTO.setId(getGenerationId());
         Voucher voucher=voucherMapper.convertVoucherCreateDTOToVoucher(voucherCreateDTO);
         return voucherMapper.convertVoucherToVoucherDTO(voucherRepository.save(voucher));
     }
@@ -33,5 +36,11 @@ public class VoucherServiceImpl implements VoucherService{
     public Page<VoucherDTO> getAll(Pageable pageable) {
        Page<Voucher> vouchers=voucherRepository.findAll(pageable);
        return vouchers.map(voucherMapper::convertVoucherToVoucherDTO);
+    }
+
+    public Integer getGenerationId() {
+        UUID uuid = UUID.randomUUID();
+        // Use most significant bits and ensure it's within the integer range
+        return (int) (uuid.getMostSignificantBits() & 0xFFFFFFFFL);
     }
 }
