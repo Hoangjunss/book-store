@@ -12,6 +12,7 @@ import java.util.List;
 @Service
 public interface OrdersService {
     List<OrdersDTO> findAllOrdersByUser(Integer idUser);
+    List<OrdersDTO> findAllOrdersByCurrentUser();
     OrdersDTO findById(Integer idOder);
     OrdersDTO create(OrdersCreateDTO ordersCreateDTO);
     OrdersDTO update(Integer id,String status);

@@ -27,6 +27,13 @@ public class OrderController {
         return ResponseEntity.ok(orders);
     }
 
+    // Get all orders by current user
+    @GetMapping("/current")
+    public ResponseEntity<List<OrdersDTO> > findAllOrdersByCurrentUser() {
+        List<OrdersDTO>  orders = ordersService.findAllOrdersByCurrentUser();
+        return ResponseEntity.ok(orders);
+    }
+
     // Retrieve a specific order by its ID
     @GetMapping("/id")
     public ResponseEntity<OrdersDTO> findById(@RequestParam Integer idOrder) {

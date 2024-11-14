@@ -63,6 +63,20 @@ public class OrdersServiceImpl implements OrdersService{
     }
 
     @Override
+    public List<OrdersDTO> findAllOrdersByCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+
+        List<Orders> orders = orderRepository.findAllByUser(user);
+        List<OrdersDTO> ordersDTOS=orders.stream().map(orders1 -> {
+            List<OrderDetailDTO>orderDetailDTOS=orderDetailsService.findAllByOrder(orders1.getId());
+            return ordersMapper.convertOrdersToOrdersDTO(orders1,orderDetailDTOS);
+        }).collect(Collectors.toList());
+
+        return ordersDTOS;
+    }
+
+    @Override
     public OrdersDTO findById(Integer idOder) {
         log.info("Find Order by id: {} " , idOder);
 
