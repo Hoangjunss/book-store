@@ -15,8 +15,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrdersCreateDTO {
-    private Integer quantity;
-    private BigDecimal totalPrice;
     private AddressDTO address;
     private String paymentStatus;
     private String orderStatus;

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
-@RequestMapping("api/v1/vnpay")
+@RequestMapping("/vnpay")
 @Controller
 public class VNPAYController {
     @Autowired

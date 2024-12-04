@@ -36,12 +36,10 @@ private JwtAuthenticationFilter jwtAuthenticationFilter;
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
             CorsConfigurationSource corsConfigurationSource) throws Exception {
-
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((auth) -> auth.requestMatchers("/users/register","/users/signin","/user/refreshtoken","/image",
-
                                 "/productsales",
                                 "/productsales/*",
                                 "/product",
@@ -54,15 +52,11 @@ private JwtAuthenticationFilter jwtAuthenticationFilter;
                         .authenticated()
 
                 ).httpBasic(Customizer.withDefaults())
-
                 // Add JWT vào chuỗi lọc và ưu tiên loc theo JWT
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider()).addFilterBefore(
                         jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class
         );
-
-
-
         return http.build();
     }
 

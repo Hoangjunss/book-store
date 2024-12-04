@@ -45,6 +45,7 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<OrdersDTO> createOrder(@RequestBody OrdersCreateDTO ordersCreateDTO) {
         OrdersDTO createdOrder = ordersService.create(ordersCreateDTO);
+        System.out.println(createdOrder.toString());
         return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
     }
     @GetMapping()
