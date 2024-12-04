@@ -3,6 +3,8 @@ package com.web.bookstore.service.orders;
 import com.web.bookstore.dto.orderDTO.orderdetailDTO.OrderDetailDTO;
 import com.web.bookstore.dto.orderDTO.ordersDTO.OrdersCreateDTO;
 import com.web.bookstore.dto.orderDTO.ordersDTO.OrdersDTO;
+import com.web.bookstore.entity.cart.Cart;
+import com.web.bookstore.entity.cart.CartDetail;
 import com.web.bookstore.entity.order.OrderStatus;
 import com.web.bookstore.entity.order.Orders;
 import com.web.bookstore.entity.other.Address;
@@ -11,6 +13,8 @@ import com.web.bookstore.entity.user.User;
 import com.web.bookstore.exception.CustomException;
 import com.web.bookstore.exception.Error;
 import com.web.bookstore.mapper.OrdersMapper;
+import com.web.bookstore.repository.cart.CartDetailRepository;
+import com.web.bookstore.repository.cart.CartRepository;
 import com.web.bookstore.repository.order.OrderRepository;
 import com.web.bookstore.repository.other.AddressRepository;
 import com.web.bookstore.repository.user.UserRepository;
@@ -23,6 +27,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -35,6 +40,10 @@ public class OrdersServiceImpl implements OrdersService{
 
     @Autowired
     private OrderRepository orderRepository;
+    @Autowired
+    private CartRepository cartRepository;
+    @Autowired
+    private CartDetailRepository cartDetailRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -93,17 +102,23 @@ public class OrdersServiceImpl implements OrdersService{
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
-
-        Address address = addressRepository.findById(ordersCreateDTO.getAddress().getId())
-                .orElseThrow(()-> new CustomException(Error.ADDRESS_NOT_FOUND));
-
-        Orders orders = ordersMapper.convertOrdersCreateDTOToOrders(ordersCreateDTO);
+        Cart cart=cartRepository.findCartByUser(user);
+        List<CartDetail> cartDetails = cartDetailRepository.findByCart(cart);
+        Integer quantity = cartDetails.stream()
+                .mapToInt(cartDetail -> cartDetail.getQuantity()) // Lấy số lượng từ từng chi tiết giỏ hàng
+                .sum();
+        BigDecimal totalPrice = cartDetails.stream()
+                .map(cartDetail -> BigDecimal.valueOf(cartDetail.getProduct().getPrice()).multiply(BigDecimal.valueOf(cartDetail.getQuantity()))) // Tính tổng giá của từng chi tiết giỏ hàng
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        Orders orders = new Orders();
         orders.setUser(user);
-        orders.setAddress(address);
+        orders.setQuantity(quantity);
+        orders.setTotalPrice(totalPrice);
         orders.setId(getGenerationId());
         orders.setOrderStatus(OrderStatus.valueOf(ordersCreateDTO.getOrderStatus()));
         orders.setPaymentStatus(Payment.valueOf(ordersCreateDTO.getPaymentStatus()));
-        List<OrderDetailDTO> orderDetailDTOS=ordersCreateDTO.getOrderDetailCreateDTOS().stream().map(orderDetailCreateDTO -> orderDetailsService.create(orderDetailCreateDTO)).collect(Collectors.toList());
+        Orders ordersSave=orderRepository.save(orders);
+        List<OrderDetailDTO> orderDetailDTOS=orderDetailsService.createByCartDetail(ordersSave,cartDetails);
         return ordersMapper.convertOrdersToOrdersDTO(orderRepository.save(orders),orderDetailDTOS);
     }
 

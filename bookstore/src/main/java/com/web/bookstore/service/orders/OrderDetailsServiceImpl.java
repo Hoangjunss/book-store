@@ -1,14 +1,18 @@
 package com.web.bookstore.service.orders;
 
+import com.paypal.api.payments.Order;
 import com.web.bookstore.dto.orderDTO.orderdetailDTO.OrderDetailCreateDTO;
 import com.web.bookstore.dto.orderDTO.orderdetailDTO.OrderDetailDTO;
 import com.web.bookstore.dto.orderDTO.orderdetailDTO.OrderDetailUpdateDTO;
+import com.web.bookstore.entity.cart.CartDetail;
 import com.web.bookstore.entity.order.OrderDetail;
 import com.web.bookstore.entity.order.Orders;
 import com.web.bookstore.entity.product.Product;
 import com.web.bookstore.exception.CustomException;
 import com.web.bookstore.exception.Error;
 import com.web.bookstore.mapper.OrderDetailMapper;
+import com.web.bookstore.repository.cart.CartDetailRepository;
+import com.web.bookstore.repository.cart.CartRepository;
 import com.web.bookstore.repository.order.OrderDetailRepository;
 import com.web.bookstore.repository.order.OrderRepository;
 import com.web.bookstore.repository.product.ProductRepository;
@@ -20,6 +24,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -29,6 +34,7 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
 
     @Autowired
     private OrderDetailRepository orderDetailsRepository;
+
 
     @Autowired
     private OrderRepository orderRepository;
@@ -134,6 +140,23 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
         orderRepository.updateTotalPriceByOrderId(orderDetail.getOrders().getId());
         return orderDetailsMapper.convertOrderDetailToOrderDetailDTO(savedOrderDetail);
     }
+
+    @Override
+    public List<OrderDetailDTO> createByCartDetail(Orders order, List<CartDetail> cartDetails) {
+        List<OrderDetail> orderDetails=cartDetails.stream().map(cartDetail -> {
+            OrderDetail orderDetail=OrderDetail.builder()
+                    .id(getGenerationId())
+                    .orders(order)
+                    .product(cartDetail.getProduct())
+                    .quantity(cartDetail.getQuantity())
+                    .unitPrice(BigDecimal.valueOf(cartDetail.getProduct().getPrice()))
+                    .totalPrice(BigDecimal.valueOf(cartDetail.getProduct().getPrice()).multiply(BigDecimal.valueOf(cartDetail.getQuantity())))
+                    .build();
+            return orderDetailsRepository.save(orderDetail);
+        }).collect(Collectors.toList());
+        return orderDetailsMapper.convertOrderDetailListToOrderDetailDTOList(orderDetails);
+    }
+
     public Integer getGenerationId() {
         UUID uuid = UUID.randomUUID();
         // Use most significant bits and ensure it's within the integer range

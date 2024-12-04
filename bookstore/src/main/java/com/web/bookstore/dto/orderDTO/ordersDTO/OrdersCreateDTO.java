@@ -15,12 +15,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrdersCreateDTO {
-    private Integer  id;
-    private Integer userId;
     private Integer quantity;
     private BigDecimal totalPrice;
     private AddressDTO address;
-    private List<OrderDetailCreateDTO> orderDetailCreateDTOS;
     private String paymentStatus;
     private String orderStatus;
 }
