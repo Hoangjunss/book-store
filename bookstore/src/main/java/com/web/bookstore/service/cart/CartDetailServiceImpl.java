@@ -124,6 +124,12 @@ private ProductRepository productRepository;
                 );
         cartService.updateCart();
     }
+
+    @Override
+    public void deleteListCartDetail(List<CartDetail> cartDetails) {
+        cartDetailRepository.deleteAll(cartDetails);
+    }
+
     public Integer getGenerationId() {
         UUID uuid = UUID.randomUUID();
         // Use most significant bits and ensure it's within the integer range

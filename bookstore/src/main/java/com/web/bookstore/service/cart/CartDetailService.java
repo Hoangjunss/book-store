@@ -4,6 +4,7 @@ import com.web.bookstore.dto.cartDTO.cartdetailDTO.CartDetailCreateDTO;
 import com.web.bookstore.dto.cartDTO.cartdetailDTO.CartDetailDTO;
 import com.web.bookstore.dto.cartDTO.cartdetailDTO.CartDetailUpdateDTO;
 import com.web.bookstore.entity.cart.Cart;
+import com.web.bookstore.entity.cart.CartDetail;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,4 +17,5 @@ public interface CartDetailService {
     boolean checkExist(Integer idCartDetail);
     CartDetailDTO updateCartDetail(CartDetailUpdateDTO cartDetailUpdateDTO);
     void deleteCartDetail(Integer id);
+    void deleteListCartDetail(List<CartDetail> cartDetails);
 }

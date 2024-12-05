@@ -12,12 +12,16 @@ import com.web.bookstore.entity.other.Payment;
 import com.web.bookstore.entity.user.User;
 import com.web.bookstore.exception.CustomException;
 import com.web.bookstore.exception.Error;
+import com.web.bookstore.mapper.AddressMapper;
 import com.web.bookstore.mapper.OrdersMapper;
 import com.web.bookstore.repository.cart.CartDetailRepository;
 import com.web.bookstore.repository.cart.CartRepository;
 import com.web.bookstore.repository.order.OrderRepository;
 import com.web.bookstore.repository.other.AddressRepository;
 import com.web.bookstore.repository.user.UserRepository;
+import com.web.bookstore.service.cart.CartDetailService;
+import com.web.bookstore.service.cart.CartService;
+import com.web.bookstore.service.other.AddressService;
 import jakarta.persistence.Id;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +48,10 @@ public class OrdersServiceImpl implements OrdersService{
     private CartRepository cartRepository;
     @Autowired
     private CartDetailRepository cartDetailRepository;
+    @Autowired
+    private AddressService addressService;
+    @Autowired
+    private AddressMapper addressMapper;
 
     @Autowired
     private UserRepository userRepository;
@@ -52,6 +60,10 @@ public class OrdersServiceImpl implements OrdersService{
     private AddressRepository addressRepository;
     @Autowired
     private OrderDetailsService orderDetailsService;
+    @Autowired
+    private CartService cartService;
+    @Autowired
+    private CartDetailService cartDetailService;
 
 
 
@@ -111,14 +123,19 @@ public class OrdersServiceImpl implements OrdersService{
                 .map(cartDetail -> BigDecimal.valueOf(cartDetail.getProduct().getPrice()).multiply(BigDecimal.valueOf(cartDetail.getQuantity()))) // Tính tổng giá của từng chi tiết giỏ hàng
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         Orders orders = new Orders();
+        Address address=addressMapper.convertAddressDTOToAddress( addressService.createAddress(ordersCreateDTO.getAddress()));
         orders.setUser(user);
         orders.setQuantity(quantity);
         orders.setTotalPrice(totalPrice);
+        orders.setAddress(address);
         orders.setId(getGenerationId());
+
         orders.setOrderStatus(OrderStatus.valueOf(ordersCreateDTO.getOrderStatus()));
         orders.setPaymentStatus(Payment.valueOf(ordersCreateDTO.getPaymentStatus()));
         Orders ordersSave=orderRepository.save(orders);
         List<OrderDetailDTO> orderDetailDTOS=orderDetailsService.createByCartDetail(ordersSave,cartDetails);
+        cartService.deleteCart(cart);
+        cartDetailService.deleteListCartDetail(cartDetails);
         return ordersMapper.convertOrdersToOrdersDTO(orderRepository.save(orders),orderDetailDTOS);
     }
 

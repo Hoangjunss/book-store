@@ -8,6 +8,8 @@ import com.web.bookstore.repository.other.AddressRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class AddressServiceImpl implements AddressService {
     @Autowired
@@ -18,6 +20,12 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public AddressDTO createAddress(AddressCreateDTO addressCreateDTO) {
         Address address=addressMapper.convertAddressCreateDTOToAddress(addressCreateDTO);
+        address.setId(getGenerationId());
         return addressMapper.convertAddressToAddressDTO(addressRepository.save(address));
+    }
+    public Integer getGenerationId() {
+        UUID uuid = UUID.randomUUID();
+        // Use most significant bits and ensure it's within the integer range
+        return (int) (uuid.getMostSignificantBits() & 0xFFFFFFFFL);
     }
 }

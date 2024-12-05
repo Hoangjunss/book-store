@@ -86,6 +86,14 @@ public class CartServiceImpl implements CartService{
         log.info("Checking if cart exists with id: {}", id);
         return cartRepository.existsById(id);
     }
+
+    @Override
+    public void deleteCart(Cart cart) {
+        cart.setPrice((double) 0);
+        cart.setQuantity(0);
+
+    }
+
     public Integer getGenerationId() {
         UUID uuid = UUID.randomUUID();
         // Use most significant bits and ensure it's within the integer range
