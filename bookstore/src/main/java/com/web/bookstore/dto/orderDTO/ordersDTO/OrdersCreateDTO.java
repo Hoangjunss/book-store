@@ -21,4 +21,5 @@ public class OrdersCreateDTO {
     private AddressCreateDTO address;
     private String paymentStatus;
     private String orderStatus;
+    private BigDecimal fee;
 }
