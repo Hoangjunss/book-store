@@ -43,7 +43,8 @@ private JwtAuthenticationFilter jwtAuthenticationFilter;
 
                 // Configure các luồng truy cập
                 .authorizeHttpRequests((auth) -> auth.requestMatchers("/users/register","/users/signin","/user/refreshtoken","/image",
-
+                                "/user",
+                                "/user/*",
                                 "/productsales",
                                 "/productsales/*",
                                 "/product",
@@ -51,8 +52,11 @@ private JwtAuthenticationFilter jwtAuthenticationFilter;
                                 "/users",
                                 "/users/*",
                                 "/category",
+                                "/category/*",
                                 "/supplies",
-                                "/supplies/*").permitAll()
+                                "/supplies/*",
+                                "/cart-details",
+                                "/cart-details/*").permitAll()
                     // Xác thực tất cả các request
                         .anyRequest()
                         .authenticated()

@@ -34,6 +34,12 @@ public class UserController {
         return new ResponseEntity<>(authDTO, HttpStatus.OK);
     }
 
+    @PostMapping("/employee")
+    public ResponseEntity<UserDTO> createEmployee(@RequestBody UserRegistrationDTO createUserRequest){
+        UserDTO userDTO = userService.createEmployee(createUserRequest);
+        return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
+    }
+
     @PostMapping("/refresh-token")
     public ResponseEntity<AuthenticationDTO> refreshToken(@RequestParam String token) {
         AuthenticationDTO authDTO = userService.generateRefreshToken(token);
@@ -62,6 +68,12 @@ public class UserController {
     public ResponseEntity<UserDTO> update(@RequestBody UserDTO userDTO) {
         UserDTO authDTO = userService.updateUser(userDTO);
         return new ResponseEntity<>(authDTO, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDTO> getUserById(@PathVariable Integer id) {
+        UserDTO userDTO = userService.findById(id);
+        return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
 
 }

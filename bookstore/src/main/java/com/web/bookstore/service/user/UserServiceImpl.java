@@ -16,6 +16,7 @@ import com.web.bookstore.service.JwtTokenUtil;
 import com.web.bookstore.service.OurUserDetailsService;
 import com.web.bookstore.service.cart.CartService;
 import com.web.bookstore.service.redis.RedisService;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -28,7 +29,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 @Service
-
+@Slf4j
 public class UserServiceImpl implements UserService{
 
     @Autowired
@@ -60,7 +61,7 @@ public class UserServiceImpl implements UserService{
         }
         user.setId(getGenerationId());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setLocked(true);
+        user.setLocked(false);
 
 
         user= userRepository.save(user);
@@ -167,7 +168,7 @@ public class UserServiceImpl implements UserService{
 
 
         // Set user as locked and save to the database
-        user.setLocked(true);
+        user.setLocked(!user.getLocked());
         userRepository.save(user);
 
         // Update the Redis cache with the locked user
@@ -176,11 +177,33 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public UserDTO updateUser(UserDTO userDTO) {
+        log.info("Updating user: {}", userDTO.toString());
         User user=userRepository.findById(userDTO.getId()).orElseThrow();
-        user.setFullname(user.getFullname());
-        user.setEmail(user.getEmail());
-        user.setUsername(user.getUsername());
+        user.setFullname(userDTO.getFullname());
+        user.setEmail(userDTO.getEmail());
+        user.setUsername(userDTO.getUsername());
         userRepository.save(user);
+        return userMapper.convertUserToCreateUserResponse(user);
+    }
+
+    @Override
+    public UserDTO createEmployee(UserRegistrationDTO createUserRequest) {
+        Role role=roleService.findByName(createUserRequest.getRole());
+
+        User user=userMapper.convertUserRegistrationDTOToUser(createUserRequest,role);
+        if(usernameExists(user.getUsername())){
+            throw new CustomException(Error.USER_ALREADY_EXISTS);
+        }
+        user.setId(getGenerationId());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setLocked(false);
+        user= userRepository.save(user);
+        return userMapper.convertUserToCreateUserResponse(user);
+    }
+
+    @Override
+    public UserDTO findById(Integer id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new CustomException(Error.USER_NOT_FOUND));
         return userMapper.convertUserToCreateUserResponse(user);
     }
 

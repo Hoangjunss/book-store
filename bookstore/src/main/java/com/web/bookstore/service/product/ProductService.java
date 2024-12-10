@@ -2,6 +2,7 @@ package com.web.bookstore.service.product;
 
 import com.web.bookstore.dto.productDTO.productDTO.ProductCreateDTO;
 import com.web.bookstore.dto.productDTO.productDTO.ProductDTO;
+import com.web.bookstore.dto.productDTO.productDTO.ProductSearchCriteria;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -13,4 +14,5 @@ public interface ProductService {
     Page<ProductDTO>getAll(Pageable pageable);
     Page<ProductDTO>getAllByCategory(Pageable pageable,Integer id);
     Page<ProductDTO>getAllSupply(Pageable pageable,Integer integer);
+    Page<ProductDTO> searchProducts(ProductSearchCriteria criteria, Pageable pageable);
 }

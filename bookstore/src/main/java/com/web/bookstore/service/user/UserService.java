@@ -19,4 +19,6 @@ public interface UserService {
     Page<UserDTO> findByName(String name,Pageable pageable);
     void lock(Integer integer);
     UserDTO updateUser(UserDTO userDTO);
+    UserDTO createEmployee(UserRegistrationDTO createUserRequest);
+    UserDTO findById(Integer id);
 }

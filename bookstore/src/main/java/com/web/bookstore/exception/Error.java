@@ -85,6 +85,8 @@ public enum Error {
     CATEGORY_UNABLE_TO_DELETE(5005, "Unable to delete category", HttpStatus.INTERNAL_SERVER_ERROR),
         // Field Category errors
         CATEGORY_INVALID_NAME(5101, "Invalid category name", HttpStatus.BAD_REQUEST),
+        CATEGORY_UNABLE_DELETE(5102, "Category unable delete", HttpStatus.BAD_REQUEST),
+    // Order-related errors
     // Warehouse-related errors
     WAREHOUSE_NOT_FOUND(6001, "Warehouse not found", HttpStatus.NOT_FOUND),
     WAREHOUSE_ALREADY_EXISTS(6002, "Warehouse already exists", HttpStatus.CONFLICT),

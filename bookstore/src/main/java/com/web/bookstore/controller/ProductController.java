@@ -2,6 +2,7 @@ package com.web.bookstore.controller;
 
 import com.web.bookstore.dto.productDTO.productDTO.ProductCreateDTO;
 import com.web.bookstore.dto.productDTO.productDTO.ProductDTO;
+import com.web.bookstore.dto.productDTO.productDTO.ProductSearchCriteria;
 import com.web.bookstore.service.product.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +72,24 @@ public class ProductController {
         Pageable pageable = PageRequest.of(page, size);
         Page<ProductDTO> products = productService.getAllByCategory(pageable,id);
 
+        return ResponseEntity.ok(products);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<ProductDTO>> searchProducts(
+            @RequestParam(required = false) Integer categoryId,
+            @RequestParam(required = false) String bookName,
+            @RequestParam(required = false) Boolean status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        ProductSearchCriteria criteria = new ProductSearchCriteria();
+        criteria.setCategoryId(categoryId);
+        criteria.setBookName(bookName);
+        criteria.setStatus(status);
+
+        Page<ProductDTO> products = productService.searchProducts(criteria, pageable);
         return ResponseEntity.ok(products);
     }
 }

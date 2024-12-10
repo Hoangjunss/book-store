@@ -2,6 +2,7 @@ package com.web.bookstore.service.product;
 
 import com.web.bookstore.dto.productDTO.productDTO.ProductCreateDTO;
 import com.web.bookstore.dto.productDTO.productDTO.ProductDTO;
+import com.web.bookstore.dto.productDTO.productDTO.ProductSearchCriteria;
 import com.web.bookstore.entity.RedisConstant;
 import com.web.bookstore.entity.product.Category;
 import com.web.bookstore.entity.product.Image;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -171,6 +173,16 @@ public class ProductServiceImpl implements ProductService {
 
             return productDTOPage;
 
+    }
+
+    @Override
+    public Page<ProductDTO> searchProducts(ProductSearchCriteria criteria, Pageable pageable) {
+        Specification<Product> spec = Specification.where(ProductSpecification.hasCategoryId(criteria.getCategoryId()))
+                .and(ProductSpecification.hasBookName(criteria.getBookName()))
+                .and(ProductSpecification.hasStatus(criteria.getStatus()));
+
+        Page<Product> products = productRepository.findAll(spec, pageable);
+        return products.map(productMapper::conventProductToProductDTO);
     }
 
     public Integer getGenerationId() {
