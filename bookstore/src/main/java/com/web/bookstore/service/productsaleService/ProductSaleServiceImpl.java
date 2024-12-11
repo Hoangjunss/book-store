@@ -101,7 +101,6 @@ Product product= productRepository.findById(updateDTO.getProductId()).orElseThro
 
     @Override
     public Page<ProductSaleDTO> getAllProductSales(String title, Integer categoryId, Double saleStartPrice, Double saleEndPrice, Pageable pageable) {
-        String cacheKey = RedisConstant.PRODUCT_SALE_LIST + title + categoryId + saleStartPrice + saleEndPrice + pageable.getPageNumber();
 
 
         Specification<ProductSale> spec = (root, query, cb) -> {
@@ -129,7 +128,7 @@ Product product= productRepository.findById(updateDTO.getProductId()).orElseThro
             }
 
             // Điều kiện: quantity > 0
-            p = cb.and(p, cb.greaterThan(product.get("quantity"), 0));
+            p = cb.and(p, cb.greaterThan(root.get("quantity"), 0));
 
             // Điều kiện: status = true
             p = cb.and(p, cb.isTrue(root.get("status")));
