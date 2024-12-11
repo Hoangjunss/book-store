@@ -22,6 +22,7 @@ import com.web.bookstore.service.supply.SupplyService;
 import com.web.bookstore.service.warehouseService.WarehouseService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -52,6 +53,7 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private WarehouseService warehouseService;
     @Autowired
+@Lazy
     private ProductSaleService productSaleService;
 
     @Override

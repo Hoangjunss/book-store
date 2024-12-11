@@ -63,6 +63,7 @@ private JwtAuthenticationFilter jwtAuthenticationFilter;
                                 "/orders",
                                 "orders/*",
                                 "/voucher",
+                                "/warehouses",
                                 "/voucher/*").permitAll()
                     // Xác thực tất cả các request
                         .anyRequest()

@@ -34,10 +34,7 @@ public class ProductSaleController {
     public ResponseEntity<ProductSaleDTO> getProductSale(@RequestParam Integer id){
         return ResponseEntity.ok( productSaleService.findById(id));
     }
-    @PostMapping()
-    public ResponseEntity<ProductSaleDTO> createProductSale(@RequestBody ProductSaleCreateDTO productSaleCreateDTO){
-        return ResponseEntity.ok(productSaleService.createProductSale(productSaleCreateDTO));
-    }
+
     @PatchMapping()
     public ResponseEntity<ProductSaleDTO> addProductSale(@RequestBody ProductSaleUpdateDTO productSaleCreateDTO){
         return ResponseEntity.ok(productSaleService.updateProductSale(productSaleCreateDTO));

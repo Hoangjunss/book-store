@@ -18,6 +18,7 @@ import com.web.bookstore.service.redis.RedisService;
 import com.web.bookstore.service.warehouseService.WarehouseService;
 import jakarta.persistence.criteria.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -47,6 +48,7 @@ public class ProductSaleServiceImpl implements ProductSaleService{
     @Autowired
     private ProductMapper productMapper;
     @Autowired
+    @Lazy
     private ProductService productService;
     @Autowired
     private WarehouseService warehouseService;
