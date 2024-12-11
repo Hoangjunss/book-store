@@ -98,6 +98,7 @@ public class UserServiceImpl implements UserService{
 
         // Cast the user to UserDetails for token generation
         UserDetails userDetails = (UserDetails) userFind;
+        User user=(User) userDetails;
 
         // Generate JWT and refresh tokens
         String jwtToken = jwtTokenUtil.generateToken(userDetails);
@@ -107,6 +108,8 @@ public class UserServiceImpl implements UserService{
         return AuthenticationDTO.builder()
                 .token(jwtToken)
                 .refreshToken(refreshToken)
+                .role(user.getRole().getRole())
+                .username(user.getUsername())
                 .build();
     }
 
