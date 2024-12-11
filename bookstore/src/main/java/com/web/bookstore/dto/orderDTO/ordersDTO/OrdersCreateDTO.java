@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -22,4 +23,5 @@ public class OrdersCreateDTO {
     private String paymentStatus;
     private String orderStatus;
     private BigDecimal fee;
+    private LocalDateTime date;
 }

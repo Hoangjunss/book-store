@@ -11,6 +11,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,6 +38,7 @@ public class OrdersMapper {
        ordersDTO.setUsername(orders.getUser().getUsername());
        ordersDTO.setOrderStatus(orders.getOrderStatus().name());
        ordersDTO.setPaymentStatus(orders.getPaymentStatus().name());
+       ordersDTO.setDate(orders.getDate());
        return ordersDTO;
     }
 

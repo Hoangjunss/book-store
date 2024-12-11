@@ -1,11 +1,13 @@
 package com.web.bookstore.service.orders;
 
 import com.web.bookstore.dto.orderDTO.orderdetailDTO.OrderDetailDTO;
+
 import com.web.bookstore.dto.orderDTO.ordersDTO.OrdersCreateDTO;
 import com.web.bookstore.dto.orderDTO.ordersDTO.OrdersDTO;
 import com.web.bookstore.entity.cart.Cart;
 import com.web.bookstore.entity.cart.CartDetail;
 import com.web.bookstore.entity.order.OrderStatus;
+
 import com.web.bookstore.entity.order.Orders;
 import com.web.bookstore.entity.other.Address;
 import com.web.bookstore.entity.other.Payment;
@@ -32,6 +34,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -118,6 +121,7 @@ public class OrdersServiceImpl implements OrdersService{
         orders.setId(getGenerationId());
         orders.setOrderStatus(OrderStatus.valueOf(ordersCreateDTO.getOrderStatus()));
         orders.setPaymentStatus(Payment.valueOf(ordersCreateDTO.getPaymentStatus()));
+        orders.setDate(LocalDateTime.now());
         Orders ordersSave = orderRepository.save(orders);
         List<OrderDetailDTO> orderDetailDTOS = orderDetailsService.createByCartDetail(ordersSave, cartDetails);
         cartService.deleteCart(cart);
@@ -128,6 +132,7 @@ public class OrdersServiceImpl implements OrdersService{
     public OrdersDTO update(Integer id, String status) {
         Orders orders=orderRepository.findById(id).orElseThrow();
         orders.setOrderStatus(OrderStatus.valueOf(status));
+        orders.setDate(LocalDateTime.now());
         Orders ordersSave=orderRepository.save(orders);
         List<OrderDetailDTO> orderDetailDTOS=orderDetailsService.findAllByOrder(ordersSave.getId());
         return ordersMapper.convertOrdersToOrdersDTO(ordersSave,orderDetailDTOS);

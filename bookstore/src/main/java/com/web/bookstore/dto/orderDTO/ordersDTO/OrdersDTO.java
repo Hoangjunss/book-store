@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -25,4 +26,5 @@ public class OrdersDTO {
     private List<OrderDetailDTO> orderDetailDTOS;
     private String paymentStatus;
     private String orderStatus;
+    private LocalDateTime date;
 }
