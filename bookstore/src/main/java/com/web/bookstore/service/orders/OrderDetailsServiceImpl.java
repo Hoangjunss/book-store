@@ -3,6 +3,7 @@ package com.web.bookstore.service.orders;
 import com.web.bookstore.dto.orderDTO.orderdetailDTO.OrderDetailCreateDTO;
 import com.web.bookstore.dto.orderDTO.orderdetailDTO.OrderDetailDTO;
 import com.web.bookstore.dto.orderDTO.orderdetailDTO.OrderDetailUpdateDTO;
+import com.web.bookstore.entity.cart.CartDetail;
 import com.web.bookstore.entity.order.OrderDetail;
 import com.web.bookstore.entity.order.Orders;
 import com.web.bookstore.entity.product.Product;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -39,6 +41,21 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
 
     @Autowired
     private ProductSaleRepository productSaleRepository;
+    @Override
+    public List<OrderDetailDTO> createByCartDetail(Orders order, List<CartDetail> cartDetails) {
+        List<OrderDetail> orderDetails=cartDetails.stream().map(cartDetail -> {
+            OrderDetail orderDetail=OrderDetail.builder()
+                    .id(getGenerationId())
+                    .orders(order)
+                    .productSale(cartDetail.getProductSale())
+                    .quantity(cartDetail.getQuantity())
+                    .unitPrice(BigDecimal.valueOf(cartDetail.getProductSale().getPrice()))
+                    .totalPrice(BigDecimal.valueOf(cartDetail.getProductSale().getPrice()).multiply(BigDecimal.valueOf(cartDetail.getQuantity())))
+                    .build();
+            return orderDetailsRepository.save(orderDetail);
+        }).collect(Collectors.toList());
+        return orderDetailsMapper.convertOrderDetailListToOrderDetailDTOList(orderDetails);
+    }
 
 
     @Override

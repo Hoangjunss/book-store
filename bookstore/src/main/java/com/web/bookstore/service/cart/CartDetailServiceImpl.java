@@ -38,6 +38,10 @@ public class CartDetailServiceImpl implements CartDetailService{
     private ProductSaleRepository productSaleRepository;
     @Autowired
     private CartService cartService;
+    @Override
+    public void deleteListCartDetail(List<CartDetail> cartDetails) {
+        cartDetailRepository.deleteAll(cartDetails);
+    }
 
 
     @Override

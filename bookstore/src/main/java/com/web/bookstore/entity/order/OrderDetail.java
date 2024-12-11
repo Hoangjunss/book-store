@@ -1,6 +1,7 @@
 package com.web.bookstore.entity.order;
 
 import com.web.bookstore.entity.product.Product;
+import com.web.bookstore.entity.product.ProductSale;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -25,7 +26,7 @@ public class OrderDetail {
     private Orders orders;
     @ManyToOne
     @JoinColumn
-    private Product product;
+    private ProductSale productSale;
     private Integer quantity;
     private BigDecimal unitPrice;
     private BigDecimal totalPrice;

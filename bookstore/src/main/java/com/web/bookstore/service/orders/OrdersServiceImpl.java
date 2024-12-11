@@ -3,6 +3,8 @@ package com.web.bookstore.service.orders;
 import com.web.bookstore.dto.orderDTO.orderdetailDTO.OrderDetailDTO;
 import com.web.bookstore.dto.orderDTO.ordersDTO.OrdersCreateDTO;
 import com.web.bookstore.dto.orderDTO.ordersDTO.OrdersDTO;
+import com.web.bookstore.entity.cart.Cart;
+import com.web.bookstore.entity.cart.CartDetail;
 import com.web.bookstore.entity.order.OrderStatus;
 import com.web.bookstore.entity.order.Orders;
 import com.web.bookstore.entity.other.Address;
@@ -10,10 +12,16 @@ import com.web.bookstore.entity.other.Payment;
 import com.web.bookstore.entity.user.User;
 import com.web.bookstore.exception.CustomException;
 import com.web.bookstore.exception.Error;
+import com.web.bookstore.mapper.AddressMapper;
 import com.web.bookstore.mapper.OrdersMapper;
+import com.web.bookstore.repository.cart.CartDetailRepository;
+import com.web.bookstore.repository.cart.CartRepository;
 import com.web.bookstore.repository.order.OrderRepository;
 import com.web.bookstore.repository.other.AddressRepository;
 import com.web.bookstore.repository.user.UserRepository;
+import com.web.bookstore.service.cart.CartDetailService;
+import com.web.bookstore.service.cart.CartService;
+import com.web.bookstore.service.other.AddressService;
 import jakarta.persistence.Id;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +31,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -32,6 +41,10 @@ import java.util.stream.Collectors;
 public class OrdersServiceImpl implements OrdersService{
     @Autowired
     private OrdersMapper ordersMapper;
+    @Autowired
+    private CartDetailRepository cartDetailRepository;
+    @Autowired
+    private CartRepository cartRepository;
 
     @Autowired
     private OrderRepository orderRepository;
@@ -43,6 +56,14 @@ public class OrdersServiceImpl implements OrdersService{
     private AddressRepository addressRepository;
     @Autowired
     private OrderDetailsService orderDetailsService;
+    @Autowired
+    private AddressService addressService;
+    @Autowired
+    private AddressMapper addressMapper;
+    @Autowired
+    private CartService cartService;
+    @Autowired
+    private CartDetailService cartDetailService;
 
 
 
@@ -75,24 +96,34 @@ public class OrdersServiceImpl implements OrdersService{
 
     @Override
     public OrdersDTO create(OrdersCreateDTO ordersCreateDTO) {
-        log.info("Create Order: {} " , ordersCreateDTO.toString());
+        log.info("Create Order: {} ", ordersCreateDTO.toString());
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
+        Cart cart = cartRepository.findCartByUser(user);
+        List<CartDetail> cartDetails = cartDetailRepository.findByCart(cart);
+        Integer quantity = cartDetails.stream()
+                .mapToInt(cartDetail -> cartDetail.getQuantity()) // Lấy số lượng từ từng chi tiết giỏ hàng
+                .sum();
+        BigDecimal totalPrice = cartDetails.stream()
+                .map(cartDetail -> BigDecimal.valueOf(cartDetail.getProductSale().getPrice()).multiply(BigDecimal.valueOf(cartDetail.getQuantity()))) // Tính tổng giá của từng chi tiết giỏ hàng
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        Address address = addressRepository.findById(ordersCreateDTO.getAddress().getId())
-                .orElseThrow(()-> new CustomException(Error.ADDRESS_NOT_FOUND));
-
-        Orders orders = ordersMapper.convertOrdersCreateDTOToOrders(ordersCreateDTO);
+        Orders orders = new Orders();
+        Address address = addressMapper.convertAddressDTOToAddress(addressService.createAddress(ordersCreateDTO.getAddress()));
         orders.setUser(user);
+        orders.setQuantity(quantity);
+        orders.setTotalPrice(totalPrice);
         orders.setAddress(address);
         orders.setId(getGenerationId());
         orders.setOrderStatus(OrderStatus.valueOf(ordersCreateDTO.getOrderStatus()));
         orders.setPaymentStatus(Payment.valueOf(ordersCreateDTO.getPaymentStatus()));
-        List<OrderDetailDTO> orderDetailDTOS=ordersCreateDTO.getOrderDetailCreateDTOS().stream().map(orderDetailCreateDTO -> orderDetailsService.create(orderDetailCreateDTO)).collect(Collectors.toList());
-        return ordersMapper.convertOrdersToOrdersDTO(orderRepository.save(orders),orderDetailDTOS);
+        Orders ordersSave = orderRepository.save(orders);
+        List<OrderDetailDTO> orderDetailDTOS = orderDetailsService.createByCartDetail(ordersSave, cartDetails);
+        cartService.deleteCart(cart);
+        cartDetailService.deleteListCartDetail(cartDetails);
+        return ordersMapper.convertOrdersToOrdersDTO(orderRepository.save(orders), orderDetailDTOS);
     }
-
     @Override
     public OrdersDTO update(Integer id, String status) {
         Orders orders=orderRepository.findById(id).orElseThrow();

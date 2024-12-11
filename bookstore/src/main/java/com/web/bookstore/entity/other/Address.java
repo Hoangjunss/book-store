@@ -15,6 +15,11 @@ import lombok.NoArgsConstructor;
 public class Address {
     @Id
     private Integer id;
-    private String address;
+    private String fullName;
+    private String email;
+    private String province;
+    private String district;
+    private String ward;
+    private String detailAddress;
     private String phone;
 }

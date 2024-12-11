@@ -80,6 +80,11 @@ public class CartServiceImpl implements CartService{
         cart.setPrice(total);
         return cartMapper.convertCartToCartDTO(cartRepository.save(cart),cartDetails);
     }
+    @Override
+    public void deleteCart(Cart cart) {
+        cart.setPrice((double) 0);
+        cart.setQuantity(0);
+    }
 
     @Override
     public boolean checkExistCart(Integer id) {
