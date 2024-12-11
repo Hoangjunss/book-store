@@ -108,20 +108,36 @@ Product product= productRepository.findById(updateDTO.getProductId()).orElseThro
             Join<ProductSale, Product> product = root.join("product", JoinType.INNER);
             Predicate p = cb.conjunction();
 
+            // Điều kiện: title không null hoặc không rỗng
             if (title != null && !title.isEmpty()) {
                 p = cb.and(p, cb.like(cb.lower(product.get("name")), "%" + title.toLowerCase() + "%"));
             }
+
+            // Điều kiện: categoryId không null hoặc không bằng 0
             if (categoryId != null && categoryId != 0) {
                 p = cb.and(p, cb.equal(product.get("category").get("id"), categoryId));
             }
+
+            // Điều kiện: saleStartPrice không null
             if (saleStartPrice != null) {
                 p = cb.and(p, cb.greaterThanOrEqualTo(root.get("price"), saleStartPrice));
             }
+
+            // Điều kiện: saleEndPrice không null
             if (saleEndPrice != null) {
                 p = cb.and(p, cb.lessThanOrEqualTo(root.get("price"), saleEndPrice));
             }
-            return cb.and(p, cb.isTrue(root.get("status")));
-        };
+
+            // Điều kiện: quantity > 0
+            p = cb.and(p, cb.greaterThan(product.get("quantity"), 0));
+
+            // Điều kiện: status = true
+            p = cb.and(p, cb.isTrue(root.get("status")));
+
+            return p;
+
+
+    };
 
         Page<ProductSale> productSales = productSaleRepository.findAll(spec, pageable);
         Page<ProductSaleDTO> productSaleDTOPage = productSales.map(productSaleMapper::convertProductSaleToProductSaleDto);
