@@ -5,11 +5,14 @@ import com.web.bookstore.dto.productDTO.supplyDTO.SupplyCreateDTO;
 import com.web.bookstore.dto.productDTO.supplyDTO.SupplyDTO;
 import com.web.bookstore.entity.RedisConstant;
 import com.web.bookstore.entity.user.Supply;
+import com.web.bookstore.exception.CustomException;
+import com.web.bookstore.exception.Error;
 import com.web.bookstore.mapper.AddressMapper;
 import com.web.bookstore.mapper.SupplyMapper;
 import com.web.bookstore.repository.user.SupplyRepository;
 import com.web.bookstore.service.other.AddressService;
 import com.web.bookstore.service.redis.RedisService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class SupplyServiceImpl implements SupplyService {
@@ -118,6 +122,34 @@ public class SupplyServiceImpl implements SupplyService {
 
 
         return supplyDTO;
+    }
+
+    @Override
+    @Transactional
+    public SupplyDTO toggleSupplyStatus(Integer id) {
+        // Tìm Supply theo ID
+        Supply supply = supplyRepository.findById(id)
+                .orElseThrow(() -> new CustomException(Error.SUPPLY_NOT_FOUND));
+
+        // Nghịch đảo trạng thái
+        supply.setStatus(!supply.isStatus());
+
+        // Lưu lại Supply đã cập nhật
+        Supply updatedSupply = supplyRepository.save(supply);
+
+        // Chuyển đổi thành DTO và trả về
+        return supplyMapper.conventSupplyToSupplyDTO(updatedSupply);
+    }
+
+    @Override
+    public List<SupplyDTO> findSuppliesByNameContaining(String name) {
+        // Tìm các Supply chứa chuỗi tên bất kỳ
+        List<Supply> supplies = supplyRepository.findByNameContaining(name);
+
+        // Chuyển đổi danh sách Supply entity sang SupplyDTO
+        return supplies.stream()
+                .map(supplyMapper::conventSupplyToSupplyDTO)
+                .collect(Collectors.toList());
     }
 
     public Integer getGenerationId() {

@@ -30,10 +30,8 @@ public class SupplyController {
     // Update an existing supply
     @PutMapping("/{id}")
     public ResponseEntity<SupplyDTO> updateSupply(
-            @PathVariable Integer id,
             @RequestBody SupplyDTO supplyDTO) {
 
-        supplyDTO.setId(id);  // Ensure the ID is set in DTO
         SupplyDTO updatedSupply = supplyService.updateSupply(supplyDTO);
         return ResponseEntity.ok(updatedSupply);
     }
@@ -44,6 +42,13 @@ public class SupplyController {
         SupplyDTO deletedSupply = supplyService.deleteSupply(id);
         return ResponseEntity.ok(deletedSupply);
     }
+
+    @PutMapping("/toggle-status/{id}")
+    public ResponseEntity<SupplyDTO> toggleSupplyStatus(@PathVariable Integer id) {
+        SupplyDTO updatedSupply = supplyService.toggleSupplyStatus(id);
+        return ResponseEntity.ok(updatedSupply);
+    }
+
 
     // Retrieve a paginated list of supplies
     @GetMapping
@@ -62,5 +67,11 @@ public class SupplyController {
 
         SupplyDTO supplyList = supplyService.findById(id);
         return ResponseEntity.ok(supplyList);
+    }
+
+    @GetMapping("/search-by-name-containing")
+    public ResponseEntity<List<SupplyDTO>> findSuppliesByNameContaining(@RequestParam String name) {
+        List<SupplyDTO> supplies = supplyService.findSuppliesByNameContaining(name);
+        return ResponseEntity.ok(supplies);
     }
 }

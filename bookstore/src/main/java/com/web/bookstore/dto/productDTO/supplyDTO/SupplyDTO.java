@@ -14,5 +14,6 @@ import lombok.NoArgsConstructor;
 public class SupplyDTO {
     private Integer id;
     private String name;
+    private boolean status;
     private AddressDTO addressDTO;
 }

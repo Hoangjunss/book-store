@@ -18,6 +18,7 @@ import com.web.bookstore.repository.product.ProductRepository;
 import com.web.bookstore.repository.user.SupplyRepository;
 import com.web.bookstore.service.redis.RedisService;
 import com.web.bookstore.service.supply.SupplyService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -44,6 +45,8 @@ public class ProductServiceImpl implements ProductService {
     private SupplyService supplyService;
     @Autowired
     private SupplyMapper supplyMapper;
+    @Autowired
+    private SupplyRepository supplyRepository;
 
     @Override
     public ProductDTO createProduct(ProductCreateDTO productDTO) {
@@ -64,50 +67,69 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public ProductDTO updateProduct(ProductCreateDTO productDTO) {
-        // Retrieve the existing product
+        // Kiểm tra ID sản phẩm
+        if (productDTO.getId() == null) {
+            throw new CustomException(Error.PRODUCT_UNABLE_TO_UPDATE);
+        }
+
+        // Lấy sản phẩm hiện có từ cơ sở dữ liệu
         Product existingProduct = productRepository.findById(productDTO.getId())
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new CustomException(Error.PRODUCT_NOT_FOUND));
 
-        // Flag to check if any changes have been made
-
-
-        // Check and update category if different
-        if (!existingProduct.getCategory().getId().equals(productDTO.getCategoryId())) {
-            existingProduct.getCategory().setId(productDTO.getCategoryId());
-
+        // Cập nhật Category nếu cần
+        if (productDTO.getCategoryId() != null && !existingProduct.getCategory().getId().equals(productDTO.getCategoryId())) {
+            Category newCategory = categoryRepository.findById(productDTO.getCategoryId())
+                    .orElseThrow(() -> new CustomException(Error.CATEGORY_NOT_FOUND));
+            existingProduct.setCategory(newCategory);
         }
 
-        // Check and update image if different
-        if (productDTO.getImage()!=null) {
-            Image image=imageService.saveImage(productDTO.getImage());
-            existingProduct.setImage(image);
-
+        // Cập nhật Supply nếu cần
+        if (productDTO.getSupplyId() != null && !existingProduct.getSupply().getId().equals(productDTO.getSupplyId())) {
+            Supply newSupply = supplyRepository.findById(productDTO.getSupplyId())
+                    .orElseThrow(() -> new CustomException(Error.SUPPLY_NOT_FOUND));
+            existingProduct.setSupply(newSupply);
         }
 
-        // Check and update supply if different
-        if (!existingProduct.getSupply().getId().equals(productDTO.getSupplyId())) {
-            existingProduct.getSupply().setId(productDTO.getSupplyId());
-
+        // Cập nhật Image nếu có
+        if (productDTO.getImage() != null && !productDTO.getImage().isEmpty()) {
+            Image newImage = imageService.saveImage(productDTO.getImage());
+            existingProduct.setImage(newImage);
         }
 
-        // Check and update other product attributes
-        if (!existingProduct.getName().equals(productDTO.getName())) {
+        // Cập nhật các thuộc tính khác nếu cần
+        if (productDTO.getName() != null && !productDTO.getName().equals(existingProduct.getName())) {
             existingProduct.setName(productDTO.getName());
-
         }
 
-        if (!existingProduct.getDescription().equals(productDTO.getDescription())) {
+        if (productDTO.getDescription() != null && !productDTO.getDescription().equals(existingProduct.getDescription())) {
             existingProduct.setDescription(productDTO.getDescription());
-
         }
 
-        // Save only if changes are detected
+        if (productDTO.getAuthor() != null && !productDTO.getAuthor().equals(existingProduct.getAuthor())) {
+            existingProduct.setAuthor(productDTO.getAuthor());
+        }
 
-            existingProduct = productRepository.save(existingProduct);
+        if (productDTO.getPage() != null && !productDTO.getPage().equals(existingProduct.getPage())) {
+            existingProduct.setPage(productDTO.getPage());
+        }
 
-        return productMapper.conventProductToProductDTO(existingProduct);
+        if (productDTO.getSize() != null && !productDTO.getSize().equals(existingProduct.getSize())) {
+            existingProduct.setSize(productDTO.getSize());
+        }
+
+        if (productDTO.getStatus() != null && !productDTO.getStatus().equals(existingProduct.getStatus())) {
+            existingProduct.setStatus(productDTO.getStatus());
+        }
+
+        // Lưu sản phẩm đã cập nhật
+        Product updatedProduct = productRepository.save(existingProduct);
+
+        // Chuyển đổi sang DTO và trả về
+        return productMapper.conventProductToProductDTO(updatedProduct);
     }
+
 
 
     @Override

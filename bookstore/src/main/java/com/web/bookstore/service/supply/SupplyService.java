@@ -13,5 +13,6 @@ public interface SupplyService {
     SupplyDTO deleteSupply(Integer id);
     Page<SupplyDTO> getList(Pageable pageable);
     SupplyDTO findById(Integer id);
-
+    SupplyDTO toggleSupplyStatus(Integer id);
+    List<SupplyDTO> findSuppliesByNameContaining(String name);
 }

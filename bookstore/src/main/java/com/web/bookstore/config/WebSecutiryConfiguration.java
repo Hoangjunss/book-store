@@ -56,7 +56,14 @@ private JwtAuthenticationFilter jwtAuthenticationFilter;
                                 "/supplies",
                                 "/supplies/*",
                                 "/cart-details",
-                                "/cart-details/*").permitAll()
+                                "/cart-details/*",
+                                "/supplies",
+                                "/supplies/*",
+                                "/supplies/*/*",
+                                "/orders",
+                                "orders/*",
+                                "/voucher",
+                                "/voucher/*").permitAll()
                     // Xác thực tất cả các request
                         .anyRequest()
                         .authenticated()

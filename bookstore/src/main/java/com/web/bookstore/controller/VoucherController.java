@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/voucher")
 public class VoucherController {
@@ -40,6 +42,20 @@ public class VoucherController {
         Pageable pageable = PageRequest.of(page, size);
         Page<VoucherDTO> voucherDTOS = voucherService.getAll(pageable);
         return ResponseEntity.ok(voucherDTOS);
+    }
+
+    @PutMapping("/toggle-status/{id}")
+    public ResponseEntity<VoucherDTO> toggleVoucherStatus(@PathVariable Integer id) {
+        VoucherDTO updatedVoucher = voucherService.toggleVoucherStatus(id);
+        return ResponseEntity.ok(updatedVoucher);
+    }
+
+    @GetMapping("/search-by-name-containing-and-status")
+    public ResponseEntity<List<VoucherDTO>> findVouchersByNameContainingAndStatus(
+            @RequestParam String name,
+            @RequestParam boolean status) {
+        List<VoucherDTO> vouchers = voucherService.findVouchersByNameContainingAndStatus(name, status);
+        return ResponseEntity.ok(vouchers);
     }
 
 }
