@@ -31,4 +31,5 @@ public class Orders {
     private OrderStatus orderStatus;
     @Enumerated(EnumType.STRING)
     private Payment paymentStatus;
+    private BigDecimal fee;
 }
