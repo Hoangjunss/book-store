@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Service
-@Slf4j
+    @Slf4j
 public class ImageServiceImpls implements ImageService {
     @Autowired
     private CloudinaryService cloudinaryService;
