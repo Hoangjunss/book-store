@@ -59,7 +59,7 @@ public class VoucherServiceImpl implements VoucherService{
     @Override
     public List<VoucherDTO> findVouchersByNameContainingAndStatus(String name, boolean status) {
         // Tìm các Voucher chứa chuỗi tên bất kỳ và theo trạng thái
-        List<Voucher> vouchers = voucherRepository.findByNameContainingAndStatus(name, status);
+        List<Voucher> vouchers = voucherRepository.findByNameVoucherContainingAndStatus(name, status);
 
         // Chuyển đổi danh sách Entity sang DTO
         return vouchers.stream()

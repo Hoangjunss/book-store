@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface VoucherRepository extends JpaRepository<Voucher,Integer> {
-    List<Voucher> findByNameContainingAndStatus(String name, boolean status);
+    List<Voucher> findByNameVoucherContainingAndStatus(String name, boolean status);
 }

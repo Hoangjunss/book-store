@@ -101,7 +101,7 @@ public class ProductSaleServiceImpl implements ProductSaleService{
             Predicate p = cb.conjunction();
 
             if (title != null && !title.isEmpty()) {
-                p = cb.and(p, cb.like(cb.lower(product.get("title")), "%" + title.toLowerCase() + "%"));
+                p = cb.and(p, cb.like(cb.lower(product.get("name")), "%" + title.toLowerCase() + "%"));
             }
             if (categoryId != null && categoryId != 0) {
                 p = cb.and(p, cb.equal(product.get("category").get("id"), categoryId));

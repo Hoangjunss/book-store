@@ -1,5 +1,6 @@
 package com.web.bookstore.dto.productDTO.productsaleDTO;
 
+import com.web.bookstore.dto.productDTO.productDTO.ProductDTO;
 import com.web.bookstore.entity.product.Product;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
