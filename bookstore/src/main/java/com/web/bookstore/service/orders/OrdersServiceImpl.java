@@ -71,11 +71,11 @@ public class OrdersServiceImpl implements OrdersService{
 
 
     @Override
-    public List<OrdersDTO> findAllOrdersByUser(Integer idUser) {
-        log.info("Find All orders by user id: {} " , idUser);
+    public List<OrdersDTO> findAllOrdersByUser() {
 
-        User user = userRepository.findById(idUser)
-                .orElseThrow(()-> new CustomException(Error.USER_NOT_FOUND));
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
 
         List<Orders> orders = orderRepository.findAllByUser(user);
         List<OrdersDTO> ordersDTOS=orders.stream().map(orders1 -> {

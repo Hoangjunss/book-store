@@ -22,8 +22,8 @@ public class OrderController {
 
     // Retrieve all orders for a specific user
     @GetMapping("/user")
-    public ResponseEntity<List<OrdersDTO>> findAllOrdersByUser(@RequestParam Integer idUser) {
-        List<OrdersDTO> orders = ordersService.findAllOrdersByUser(idUser);
+    public ResponseEntity<List<OrdersDTO>> findAllOrdersByUser() {
+        List<OrdersDTO> orders = ordersService.findAllOrdersByUser();
         return ResponseEntity.ok(orders);
     }
 
