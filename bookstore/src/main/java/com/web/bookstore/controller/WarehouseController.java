@@ -30,13 +30,13 @@ public class WarehouseController {
         return ResponseEntity.ok(warehouses);
     }
     @GetMapping("/id")
-    public ResponseEntity<Page<WarehouseDTO>> getAllWarehousesByIdProduct(
+    public ResponseEntity<WarehouseDTO> getAllWarehousesByIdProduct(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam Integer idProduct) {
 
-        Pageable pageable = PageRequest.of(page, size);
-        Page<WarehouseDTO> warehouses = warehouseService.getIdProduct(pageable,idProduct);
+
+        WarehouseDTO warehouses = warehouseService.getIdProduct(idProduct);
 
         return ResponseEntity.ok(warehouses);
     }

@@ -4,7 +4,7 @@ import com.web.bookstore.entity.product.Product;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +21,7 @@ import java.time.LocalDate;
 public class Warehouse {
     @Id
     private Integer id;
-    @ManyToOne
+    @OneToOne
     @JoinColumn
     private Product product;
     private Integer quantity;

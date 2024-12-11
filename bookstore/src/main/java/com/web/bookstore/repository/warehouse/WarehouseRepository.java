@@ -10,6 +10,6 @@ import java.util.Optional;
 
 public interface WarehouseRepository extends JpaRepository<Warehouse,Integer> {
 
-    Page<Warehouse> findAllByProduct(Pageable pageable,Product product);
+    Warehouse findByProduct(Product product);
     Page<Warehouse> findAllByProductAndQuantityGreaterThan(Pageable pageable, Product product, int quantity);
 }

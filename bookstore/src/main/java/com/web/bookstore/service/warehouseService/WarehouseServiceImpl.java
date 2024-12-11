@@ -30,14 +30,11 @@ public class WarehouseServiceImpl implements WarehouseService{
     @Override
     public void updateWarehouse(Product product, Integer quantity, BigDecimal unitPrice) {
 
-            WarehouseCreateDTO warehouseCreateDTO = new WarehouseCreateDTO();
-            warehouseCreateDTO.setIdProduct(product.getId());
-            warehouseCreateDTO.setQuantity(quantity);
-            warehouseCreateDTO.setPrice(unitPrice);
-            warehouseCreateDTO.setStatus(true);
-            warehouseCreateDTO.setDate(LocalDate.now());
+            WarehouseDTO warehouseDTO=getIdProduct(product.getId());
+            warehouseDTO.setPrice(warehouseDTO.getPrice().add(unitPrice));
+            warehouseDTO.setQuantity(warehouseDTO.getQuantity()+quantity);
 
-           Warehouse warehouse = warehouseMapper.conventWarehouseCreateDTOToWarehouse(warehouseCreateDTO, product);
+           Warehouse warehouse = Warehouse.builder().id(warehouseDTO.getId()).date(warehouseDTO.getDate()).price(warehouseDTO.getPrice()).product(product).quantity(warehouseDTO.getQuantity()).status(warehouseDTO.getStatus()).build();
 
 
         warehouseRepository.save(warehouse);
@@ -52,10 +49,10 @@ public class WarehouseServiceImpl implements WarehouseService{
     }
 
     @Override
-    public Page<WarehouseDTO> getIdProduct(Pageable pageable, Integer id) {
+    public WarehouseDTO getIdProduct(Integer id) {
         Product product=productRepository.findById(id).orElseThrow();
-        Page<Warehouse> warehousePage=warehouseRepository.findAllByProduct(pageable,product);
-        return warehousePage.map(warehouseMapper::conventWarehouseToWarehouseDTO);
+        Warehouse warehouse=warehouseRepository.findByProduct(product);
+        return warehouseMapper.conventWarehouseToWarehouseDTO(warehouse);
     }
 
     @Override
