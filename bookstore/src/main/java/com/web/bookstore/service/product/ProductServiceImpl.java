@@ -16,8 +16,10 @@ import com.web.bookstore.mapper.SupplyMapper;
 import com.web.bookstore.repository.product.CategoryRepository;
 import com.web.bookstore.repository.product.ProductRepository;
 import com.web.bookstore.repository.user.SupplyRepository;
+import com.web.bookstore.service.productsaleService.ProductSaleService;
 import com.web.bookstore.service.redis.RedisService;
 import com.web.bookstore.service.supply.SupplyService;
+import com.web.bookstore.service.warehouseService.WarehouseService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -47,6 +49,10 @@ public class ProductServiceImpl implements ProductService {
     private SupplyMapper supplyMapper;
     @Autowired
     private SupplyRepository supplyRepository;
+    @Autowired
+    private WarehouseService warehouseService;
+    @Autowired
+    private ProductSaleService productSaleService;
 
     @Override
     public ProductDTO createProduct(ProductCreateDTO productDTO) {
@@ -59,7 +65,8 @@ public class ProductServiceImpl implements ProductService {
         product.setCategory(category);
         product.setImage(image);
         product.setSupply(supply);
-
+       warehouseService.createWarehouse(product);
+       productSaleService.createProductSale(product);
         ProductDTO productDTO1= productMapper.conventProductToProductDTO(productRepository.save(product));
         String productKey = RedisConstant.PRODUCT + productDTO1.getId();
 
