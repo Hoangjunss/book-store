@@ -62,6 +62,12 @@ public class WarehouseServiceImpl implements WarehouseService{
         return warehousePage.map(warehouseMapper::conventWarehouseToWarehouseDTO);
     }
 
+    @Override
+    public void createWarehouse(Product product) {
+        Warehouse warehouse = Warehouse.builder().id(getGenerationId()).date(LocalDate.now()).product(product).quantity(0).status(true).build();
+        warehouseRepository.save(warehouse);
+    }
+
     public Integer getGenerationId() {
         UUID uuid = UUID.randomUUID();
         // Use most significant bits and ensure it's within the integer range

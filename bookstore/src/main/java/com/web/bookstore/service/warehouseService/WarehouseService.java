@@ -13,4 +13,5 @@ public interface WarehouseService {
     Page<WarehouseDTO> getList(Pageable pageable);
     WarehouseDTO getIdProduct(Integer id);
     Page<WarehouseDTO> getIdProductThanQuantity(Pageable pageable,Integer id);
+    void createWarehouse(Product product);
 }

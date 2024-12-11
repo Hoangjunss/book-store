@@ -3,6 +3,7 @@ package com.web.bookstore.service.productsaleService;
 import com.web.bookstore.dto.productDTO.productsaleDTO.ProductSaleCreateDTO;
 import com.web.bookstore.dto.productDTO.productsaleDTO.ProductSaleDTO;
 import com.web.bookstore.dto.productDTO.productsaleDTO.ProductSaleUpdateDTO;
+import com.web.bookstore.dto.warehouseDTO.warehouseDTO.WarehouseDTO;
 import com.web.bookstore.entity.RedisConstant;
 import com.web.bookstore.entity.product.Product;
 import com.web.bookstore.entity.product.ProductSale;
@@ -14,6 +15,7 @@ import com.web.bookstore.repository.product.ProductSaleRepository;
 import com.web.bookstore.repository.warehouse.WarehouseRepository;
 import com.web.bookstore.service.product.ProductService;
 import com.web.bookstore.service.redis.RedisService;
+import com.web.bookstore.service.warehouseService.WarehouseService;
 import jakarta.persistence.criteria.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -45,17 +48,21 @@ public class ProductSaleServiceImpl implements ProductSaleService{
     private ProductMapper productMapper;
     @Autowired
     private ProductService productService;
+    @Autowired
+    private WarehouseService warehouseService;
     @Override
-    public ProductSaleDTO createProductSale(ProductSaleCreateDTO createDTO) {
-        Product product =productMapper.conventProductDTOToProduct(productService.findById(createDTO.getProductId()));
-        // Convert DTO to ProductSale entity and save
-        ProductSale productSale = productSaleMapper.convertProductSaleCreateDtoToProductSale(createDTO, product);
+    public ProductSaleDTO createProductSale(Product product) {
+       ProductSale productSale=new ProductSale();
         productSale.setId(getGenerationId());
+        productSale.setProduct(product);
+        productSale.setPrice(0.0);
+        productSale.setQuantity(0);
+        productSale.setStatus(true);
         ProductSale savedProductSale = productSaleRepository.save(productSale);
 
         // Convert to DTO and cache it in Redis
         ProductSaleDTO productSaleDTO = productSaleMapper.convertProductSaleToProductSaleDto(savedProductSale);
-        String productSaleKey = RedisConstant.PRODUCT_SALE + savedProductSale.getId();
+
 
 
         // Add to the list of all product sales in Redis
@@ -67,11 +74,10 @@ public class ProductSaleServiceImpl implements ProductSaleService{
     public ProductSaleDTO updateProductSale(ProductSaleUpdateDTO updateDTO) {
         ProductSale existingProductSale = productSaleRepository.findById(updateDTO.getId())
                 .orElseThrow(() -> new RuntimeException("ProductSale not found"));
+Product product= productRepository.findById(updateDTO.getProductId()).orElseThrow();
+        WarehouseDTO warehouseDTO=warehouseService.getIdProduct(updateDTO.getProductId());
+        Warehouse warehouse = Warehouse.builder().id(getGenerationId()).date(LocalDate.now()).product(product).quantity(0).status(true).build();
 
-        Warehouse warehouse = warehouseRepository.findById(updateDTO.getWarehouseId())
-                .orElseThrow(() -> new RuntimeException("Product not found in warehouse"));
-
-        Product product = warehouse.getProduct();
         int quantityDifference = updateDTO.getQuantity() - existingProductSale.getQuantity();
 
         // Update warehouse quantity based on change

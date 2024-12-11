@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 public class ProductSaleUpdateDTO {
     private Integer id;
     private Integer productId;
-    private Integer warehouseId;
     private Integer quantity;
     private Boolean status;
     private Double price;
