@@ -1,6 +1,7 @@
 package com.web.bookstore.service.warehouseService;
 
 
+import com.web.bookstore.dto.StaticWarehouseReceiptDTO;
 import com.web.bookstore.dto.warehouseDTO.warehousereceiptDTO.WarehouseReceiptCreateDTO;
 import com.web.bookstore.dto.warehouseDTO.warehousereceiptDTO.WarehouseReceiptDTO;
 import com.web.bookstore.dto.warehouseDTO.warehousereceiptDTO.WarehouseReceiptUpdateDTO;
@@ -14,4 +15,5 @@ public interface WarehouseReceiptService {
     WarehouseReceiptDTO updateWarehouseReceipt(WarehouseReceiptUpdateDTO updateDTO);
     Page<WarehouseReceiptDTO> getList(Pageable pageable);
     WarehouseReceiptDTO findById(Integer id);
+    StaticWarehouseReceiptDTO staticWarehouseReceipt(String month, String year);
 }

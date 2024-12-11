@@ -16,17 +16,17 @@ import java.math.BigDecimal;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-public class WarehouseReceiptDetail {
-    @Id
-    private Integer id;
-    @ManyToOne
-    @JoinColumn
-    private Product product;
-    private Integer quantity;
-    private BigDecimal unitPrice;
-    private BigDecimal totalPrice;
-    @ManyToOne
-    @JoinColumn
-    private WarehouseReceipt warehouseReceipt;
-}
+    @Entity
+    public class WarehouseReceiptDetail {
+        @Id
+        private Integer id;
+        @ManyToOne
+        @JoinColumn
+        private Product product;
+        private Integer quantity;
+        private BigDecimal unitPrice;
+        private BigDecimal totalPrice;
+        @ManyToOne
+        @JoinColumn
+        private WarehouseReceipt warehouseReceipt;
+    }

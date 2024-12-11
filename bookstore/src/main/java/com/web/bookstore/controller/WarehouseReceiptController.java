@@ -1,5 +1,6 @@
 package com.web.bookstore.controller;
 
+import com.web.bookstore.dto.StaticWarehouseReceiptDTO;
 import com.web.bookstore.dto.warehouseDTO.warehousereceiptDTO.WarehouseReceiptCreateDTO;
 import com.web.bookstore.dto.warehouseDTO.warehousereceiptDTO.WarehouseReceiptDTO;
 import com.web.bookstore.dto.warehouseDTO.warehousereceiptDTO.WarehouseReceiptUpdateDTO;
@@ -41,6 +42,16 @@ public class WarehouseReceiptController {
         updateDTO.setId(id);
         WarehouseReceiptDTO updatedReceipt = warehouseReceiptService.updateWarehouseReceipt(updateDTO);
         return ResponseEntity.ok(updatedReceipt);
+    }
+    @GetMapping("/statistics")
+    public ResponseEntity<StaticWarehouseReceiptDTO> getWarehouseStatistics(
+            @RequestParam(required = false) String month,
+            @RequestParam(required = false) String year) {
+        // Gọi service để lấy kết quả thống kê
+        StaticWarehouseReceiptDTO statistics = warehouseReceiptService.staticWarehouseReceipt(month, year);
+
+        // Trả về DTO dưới dạng JSON
+        return ResponseEntity.ok(statistics);
     }
 
     @GetMapping("/warehouse")

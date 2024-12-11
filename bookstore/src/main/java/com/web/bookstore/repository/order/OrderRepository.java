@@ -21,4 +21,5 @@ public interface OrderRepository extends JpaRepository<Orders,Integer> {
     @Query("UPDATE Orders o SET o.totalPrice = (SELECT SUM(od.totalPrice) FROM OrderDetail od WHERE od.orders.id = :orderId) WHERE o.id = :orderId")
     void updateTotalPriceByOrderId(@Param("orderId") Integer orderId);
     Page<Orders> findByOrderStatus(OrderStatus orderStatus, Pageable pageable);
+    List<Orders> findAllByStatus(OrderStatus orderStatus);
 }

@@ -1,6 +1,7 @@
 package com.web.bookstore.service.warehouseService;
 
 
+import com.web.bookstore.dto.StaticWarehouseReceiptDTO;
 import com.web.bookstore.dto.warehouseDTO.warehousereceiptDTO.WarehouseReceiptCreateDTO;
 import com.web.bookstore.dto.warehouseDTO.warehousereceiptDTO.WarehouseReceiptDTO;
 import com.web.bookstore.dto.warehouseDTO.warehousereceiptDTO.WarehouseReceiptUpdateDTO;
@@ -19,9 +20,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 public class WarehouseReceiptServiceImpl implements WarehouseReceiptService{
 
@@ -38,6 +43,39 @@ public class WarehouseReceiptServiceImpl implements WarehouseReceiptService{
     private WarehouseReceiptDetailService warehouseReceiptDetailService;
     @Autowired
     private WarehouseReceiptDetailRepository warehouseReceiptDetailRepository;
+    @Override
+    public StaticWarehouseReceiptDTO staticWarehouseReceipt(String month, String year) {
+
+        // Lấy danh sách tất cả các WarehouseReceipt
+        List<WarehouseReceipt> receipts = warehouseReceiptRepository.findAll();
+
+        // Lọc theo tháng và năm
+        List<WarehouseReceipt> filteredReceipts = receipts.stream()
+                .filter(receipt -> {
+                    LocalDate receiptDate = receipt.getDate(); // Giả định `date` là kiểu LocalDate
+                    boolean matchMonth = (month == null || receiptDate.getMonthValue() == Integer.parseInt(month));
+                    boolean matchYear = (year == null || receiptDate.getYear() == Integer.parseInt(year));
+                    return matchMonth && matchYear;
+                })
+                .collect(Collectors.toList());
+
+        // Tính tổng số lượng và tổng giá trị
+        int totalQuantity = filteredReceipts.stream()
+                .mapToInt(WarehouseReceipt::getQuantity)
+                .sum();
+
+        BigDecimal totalRevenue = filteredReceipts.stream()
+                .map(WarehouseReceipt::getTotalPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // Tạo DTO và trả về
+        StaticWarehouseReceiptDTO receiptDto = new StaticWarehouseReceiptDTO();
+
+        receiptDto.setTotalQuantity(totalQuantity);
+        receiptDto.setTotalPrice(totalRevenue);
+
+        return receiptDto;
+    }
 
     @Override
     public WarehouseReceiptDTO addWarehouseReceipt(WarehouseReceiptCreateDTO createDTO) {

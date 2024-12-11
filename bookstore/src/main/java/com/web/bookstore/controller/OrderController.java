@@ -1,5 +1,6 @@
 package com.web.bookstore.controller;
 
+import com.web.bookstore.dto.orderDTO.StaticOrderDto;
 import com.web.bookstore.dto.orderDTO.ordersDTO.OrdersCreateDTO;
 import com.web.bookstore.dto.orderDTO.ordersDTO.OrdersDTO;
 import com.web.bookstore.service.orders.OrdersService;
@@ -26,6 +27,17 @@ public class OrderController {
         List<OrdersDTO> orders = ordersService.findAllOrdersByUser();
         return ResponseEntity.ok(orders);
     }
+    @GetMapping("/statistics")
+    public ResponseEntity<StaticOrderDto> getStatistics(
+            @RequestParam(required = false) String month,
+            @RequestParam(required = false) String year) {
+        // Gọi service để lấy thống kê
+        StaticOrderDto statistics = ordersService.staticMonth(month, year);
+
+        // Trả về DTO dưới dạng JSON
+        return ResponseEntity.ok(statistics);
+    }
+
 
     // Retrieve a specific order by its ID
     @GetMapping("/id")
