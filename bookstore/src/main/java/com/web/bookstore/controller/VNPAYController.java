@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
-@RequestMapping("api/v1/vnpay")
+@RequestMapping("/vnpay")
 @Controller
 public class VNPAYController {
     @Autowired
@@ -19,12 +19,12 @@ public class VNPAYController {
     @GetMapping("/pay")
     public ResponseEntity<String> getPay(@RequestParam("price") Long price, @RequestParam("id") Integer id)throws UnsupportedEncodingException {
         String url= vnpayService.getPay(price,id);
-       return  ResponseEntity.ok(url);
+        return  ResponseEntity.ok(url);
     }
     @GetMapping("/returnPay")
     public ResponseEntity<Boolean> paymentCallback(@RequestParam Map<String, String> queryParams) throws IOException {
-   String response=vnpayService.returnPay(queryParams.get("vnp_ResponseCode"),queryParams.get("contractId"));
+        String response=vnpayService.returnPay(queryParams.get("vnp_ResponseCode"),queryParams.get("contractId"));
         return  ResponseEntity.ok(false);
-        }
-
     }
+
+}
