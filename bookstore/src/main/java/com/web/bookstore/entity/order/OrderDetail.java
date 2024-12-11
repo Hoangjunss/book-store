@@ -26,7 +26,7 @@ public class OrderDetail {
     private Orders orders;
     @ManyToOne
     @JoinColumn
-    private ProductSale productSale;
+    private Product product;
     private Integer quantity;
     private BigDecimal unitPrice;
     private BigDecimal totalPrice;

@@ -47,7 +47,7 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
             OrderDetail orderDetail=OrderDetail.builder()
                     .id(getGenerationId())
                     .orders(order)
-                    .productSale(cartDetail.getProductSale())
+                    .product(cartDetail.getProductSale().getProduct())
                     .quantity(cartDetail.getQuantity())
                     .unitPrice(BigDecimal.valueOf(cartDetail.getProductSale().getPrice()))
                     .totalPrice(BigDecimal.valueOf(cartDetail.getProductSale().getPrice()).multiply(BigDecimal.valueOf(cartDetail.getQuantity())))
