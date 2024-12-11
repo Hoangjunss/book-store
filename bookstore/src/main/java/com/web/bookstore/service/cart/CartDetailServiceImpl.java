@@ -72,9 +72,20 @@ public class CartDetailServiceImpl implements CartDetailService{
         CartDetail cartDetail=cartDetailRepository.findByCartAndProductSale(cart,productSale);
         if (cartDetail != null) {
             // If the CartDetail exists, update the quantity
-            cartDetail.setQuantity(cartDetail.getQuantity() + cartDetailCreateDTO.getQuantity());
+            int updatedQuantity = cartDetail.getQuantity() + cartDetailCreateDTO.getQuantity();
+
+            // Kiểm tra nếu tổng số lượng vượt quá giới hạn (ví dụ: productSale.getQuantity())
+            if (updatedQuantity > productSale.getQuantity()) {
+                throw new IllegalArgumentException("Số lượng vượt quá giới hạn cho phép! Số lượng còn lại: " + productSale.getQuantity());
+            }
+
+            // Nếu không vượt, cập nhật số lượng
+            cartDetail.setQuantity(updatedQuantity);
         } else {
             // If CartDetail does not exist, create a new one
+            if (cartDetailCreateDTO.getQuantity() > productSale.getQuantity()) {
+                throw new IllegalArgumentException("Số lượng vượt quá giới hạn cho phép! Số lượng còn lại: " + productSale.getQuantity());
+            }
            cartDetail = cartDetailMapper.convertCartDetailCreateDTOToCartDetail(cartDetailCreateDTO, productSale, cart);
            cartDetail.setId(getGenerationId());
         }
@@ -109,6 +120,9 @@ public class CartDetailServiceImpl implements CartDetailService{
         User user = (User) authentication.getPrincipal();
         ProductSale productSale=productSaleRepository.findById(cartDetailUpdateDTO.getProductSaleId()).orElseThrow();
         Cart cart=cartRepository.findCartByUser(user);
+        if (cartDetailUpdateDTO.getQuantity() > productSale.getQuantity()) {
+            throw new IllegalArgumentException("Số lượng vượt quá giới hạn cho phép! Số lượng còn lại: " + productSale.getQuantity());
+        }
 
         CartDetail cartDetail = cartDetailMapper.convertCartDetailUpdateDTOToCartDetail(cartDetailUpdateDTO, productSale, cart);
         CartDetailDTO cartDetailDTO=cartDetailMapper.convertCartDetailToCartDetailDTO(cartDetailRepository.save(cartDetail));
