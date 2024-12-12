@@ -17,6 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
+
 @Service
 public class WarehouseReceiptDetailServiceImpl implements WarehouseReceiptDetailService {
     @Autowired
@@ -43,7 +45,7 @@ public class WarehouseReceiptDetailServiceImpl implements WarehouseReceiptDetail
 
         WarehouseReceiptDetail detail = warehouseMapper.convertWarehouseReceiptDetailCreateDTOToWarehouseReceiptDetail(detailCreateDTO, product);
         detail.setWarehouseReceipt(warehouseReceipt);
-
+detail.setId(getGenerationId());
         WarehouseReceiptDetail savedDetail = warehouseReceiptDetailRepository.save(detail);
 
         warehouseService.updateWarehouse(product, detailCreateDTO.getQuantity(), detailCreateDTO.getUnitPrice());
@@ -88,5 +90,10 @@ public class WarehouseReceiptDetailServiceImpl implements WarehouseReceiptDetail
 
         // Map each WarehouseReceiptDetail entity to WarehouseReceiptDetailDTO
         return details.map(warehouseMapper::convertWarehouseReceiptDetailToWarehouseReceiptDetailDTO);
+    }
+    public Integer getGenerationId() {
+        UUID uuid = UUID.randomUUID();
+        // Use most significant bits and ensure it's within the integer range
+        return (int) (uuid.getMostSignificantBits() & 0xFFFFFFFFL);
     }
 }
