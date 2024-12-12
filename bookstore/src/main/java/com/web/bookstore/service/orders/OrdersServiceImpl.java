@@ -25,7 +25,6 @@ import com.web.bookstore.repository.user.UserRepository;
 import com.web.bookstore.service.cart.CartDetailService;
 import com.web.bookstore.service.cart.CartService;
 import com.web.bookstore.service.other.AddressService;
-import jakarta.persistence.Id;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -35,7 +34,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -162,7 +160,7 @@ public class OrdersServiceImpl implements OrdersService{
     public StaticOrderDto staticMonth(String month, String year) {
 
             // Lấy danh sách các đơn hàng theo trạng thái (ví dụ: hoàn tất)
-            List<Orders> orders = orderRepository.findAllByStatus(OrderStatus.SUCCESS);
+            List<Orders> orders = orderRepository.findAllByOrderStatus(OrderStatus.SUCCESS);
 
             // Lọc đơn hàng theo tháng và năm
             List<Orders> filteredOrders = orders.stream()
