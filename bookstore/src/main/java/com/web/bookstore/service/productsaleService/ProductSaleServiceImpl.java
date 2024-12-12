@@ -52,6 +52,7 @@ public class ProductSaleServiceImpl implements ProductSaleService{
     private ProductService productService;
     @Autowired
     private WarehouseService warehouseService;
+
     @Override
     public ProductSaleDTO createProductSale(Product product) {
        ProductSale productSale=new ProductSale();
@@ -77,9 +78,8 @@ public class ProductSaleServiceImpl implements ProductSaleService{
         ProductSale existingProductSale = productSaleRepository.findById(updateDTO.getId())
                 .orElseThrow(() -> new RuntimeException("ProductSale not found"));
 Product product= productRepository.findById(updateDTO.getProductId()).orElseThrow();
-        WarehouseDTO warehouseDTO=warehouseService.getIdProduct(updateDTO.getProductId());
-        Warehouse warehouse = Warehouse.builder().id(getGenerationId()).date(LocalDate.now()).product(product).quantity(0).status(true).build();
 
+        Warehouse warehouse =warehouseRepository.findByProduct(product);
         int quantityDifference = updateDTO.getQuantity() - existingProductSale.getQuantity();
 
         // Update warehouse quantity based on change

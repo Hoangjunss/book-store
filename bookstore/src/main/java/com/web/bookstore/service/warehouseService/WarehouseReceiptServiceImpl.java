@@ -25,6 +25,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -87,6 +88,7 @@ public class WarehouseReceiptServiceImpl implements WarehouseReceiptService{
         Supply supply = optionalSupply.get();
 
         WarehouseReceipt warehouseReceipt = warehouseMapper.convertWarehouseReceiptCreateDTOToWarehouseReceipt(createDTO, supply);
+        warehouseReceipt.setId(getGenerationId());
         WarehouseReceipt savedWarehouseReceipt = warehouseReceiptRepository.save(warehouseReceipt);
 
         List<WarehouseReceiptDetail> warehouseReceiptDetails = new ArrayList<>();
@@ -146,5 +148,10 @@ public class WarehouseReceiptServiceImpl implements WarehouseReceiptService{
         WarehouseReceipt warehouseReceipt=warehouseReceiptRepository.findById(id).orElseThrow();
         List<WarehouseReceiptDetail> warehouseReceiptDetails=warehouseReceiptDetailRepository.findByWarehouseReceipt(warehouseReceipt);
         return warehouseMapper.convertWarehouseReceiptToWarehouseReceiptDTO(warehouseReceipt,warehouseReceiptDetails);
+    }
+    public Integer getGenerationId() {
+        UUID uuid = UUID.randomUUID();
+        // Use most significant bits and ensure it's within the integer range
+        return (int) (uuid.getMostSignificantBits() & 0xFFFFFFFFL);
     }
 }
