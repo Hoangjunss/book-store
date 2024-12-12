@@ -162,7 +162,7 @@ public class OrdersServiceImpl implements OrdersService{
     public StaticOrderDto staticMonth(String month, String year) {
 
             // Lấy danh sách các đơn hàng theo trạng thái (ví dụ: hoàn tất)
-            List<Orders> orders = orderRepository.findAllByStatus(OrderStatus.SUCCESS);
+            List<Orders> orders = orderRepository.findAllByOrderStatus(OrderStatus.SUCCESS);
 
             // Lọc đơn hàng theo tháng và năm
             List<Orders> filteredOrders = orders.stream()
