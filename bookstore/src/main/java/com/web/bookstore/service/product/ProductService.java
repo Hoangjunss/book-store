@@ -14,5 +14,6 @@ public interface ProductService {
     ProductDTO findById(Integer id);
     Page<ProductDTO>getAll(Pageable pageable);
     Page<ProductDTO>getAllByCategory(Pageable pageable,Integer id);
+    long count();
 
 }

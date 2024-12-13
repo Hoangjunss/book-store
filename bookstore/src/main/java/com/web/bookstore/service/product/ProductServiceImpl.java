@@ -209,10 +209,16 @@ public class ProductServiceImpl implements ProductService {
         return products.map(productMapper::conventProductToProductDTO);
     }
 
+    @Override
+    public long count() {
+        return productRepository.count();
+    }
+
 
     public Integer getGenerationId() {
         UUID uuid = UUID.randomUUID();
         // Use most significant bits and ensure it's within the integer range
         return (int) (uuid.getMostSignificantBits() & 0xFFFFFFFFL);
     }
+
 }

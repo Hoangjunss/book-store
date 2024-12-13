@@ -1,5 +1,6 @@
 package com.web.bookstore.service.orders;
 
+import com.web.bookstore.dto.orderDTO.StaticOrderDto;
 import com.web.bookstore.dto.orderDTO.orderdetailDTO.OrderDetailDTO;
 import com.web.bookstore.dto.orderDTO.ordersDTO.OrdersCreateDTO;
 import com.web.bookstore.dto.orderDTO.ordersDTO.OrdersDTO;
@@ -131,7 +132,7 @@ public class OrdersServiceImpl implements OrdersService{
         orders.setAddress(address);
         orders.setId(getGenerationId());
         orders.setDate(LocalDateTime.now());
-
+orders.setFee(ordersCreateDTO.getFee());
         orders.setOrderStatus(OrderStatus.valueOf(ordersCreateDTO.getOrderStatus()));
         orders.setPaymentStatus(Payment.valueOf(ordersCreateDTO.getPaymentStatus()));
         Orders ordersSave=orderRepository.save(orders);
@@ -169,6 +170,41 @@ public class OrdersServiceImpl implements OrdersService{
             return ordersMapper.convertOrdersToOrdersDTO(order, orderDetailDTOS);
         });
     }
+
+    @Override
+    public long count() {
+        return orderRepository.count();
+    }
+    @Override
+    public StaticOrderDto staticMonth(String month, String year) {
+
+        // Lấy danh sách các đơn hàng theo trạng thái (ví dụ: hoàn tất)
+        List<Orders> orders = orderRepository.findAllByOrderStatus(OrderStatus.SUCCESS);
+
+        // Lọc đơn hàng theo tháng và năm
+        List<Orders> filteredOrders = orders.stream()
+                .filter(order -> {
+                    LocalDateTime orderDate = order.getDate(); // Giả định `date` là kiểu LocalDate
+                    boolean matchMonth = (month == null || orderDate.getMonthValue() == Integer.parseInt(month));
+                    boolean matchYear = (year == null || orderDate.getYear() == Integer.parseInt(year));
+                    return matchMonth && matchYear;
+                })
+                .collect(Collectors.toList());
+
+        // Thực hiện thống kê
+        int totalQuantity = filteredOrders.stream()
+                .mapToInt(order -> order.getQuantity())
+                .sum();
+
+        BigDecimal totalRevenue = filteredOrders.stream()
+                .map(order -> order.getTotalPrice())
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        StaticOrderDto staticOrderDto =new StaticOrderDto();
+        return  staticOrderDto;
+    }
+
+
     public Integer getGenerationId() {
         UUID uuid = UUID.randomUUID();
         // Use most significant bits and ensure it's within the integer range

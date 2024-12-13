@@ -184,6 +184,11 @@ public class UserServiceImpl implements UserService{
         return userMapper.convertUserToCreateUserResponse(user);
     }
 
+    @Override
+    public long count() {
+        return userRepository.count();
+    }
+
     private boolean usernameExists(String username) {
         return userRepository.findByUsername(username).isPresent();
     }

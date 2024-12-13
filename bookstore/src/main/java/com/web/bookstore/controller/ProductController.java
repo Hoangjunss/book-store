@@ -50,6 +50,11 @@ public class ProductController {
 
         return ResponseEntity.ok(products);
     }
+    @GetMapping("/count")
+    public ResponseEntity<Long>count() {
+        Long count= productService.count();
+        return new ResponseEntity<>(count, HttpStatus.OK);
+    }
     @PreAuthorize("permitAll()")
     @GetMapping("/id")
     public ResponseEntity<ProductDTO> getProducts( @RequestParam Integer id) {

@@ -29,7 +29,7 @@ public class ProductMapper {
         ProductDTO productDTO=modelMapper.map(product,ProductDTO.class);
         productDTO.setCategory(product.getCategory().getName());
         productDTO.setImage(product.getImage().getUrl());
-        productDTO.setSupply(product.getSupply().getName());
+
         return productDTO;
     }
 }

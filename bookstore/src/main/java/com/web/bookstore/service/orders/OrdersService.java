@@ -1,5 +1,6 @@
 package com.web.bookstore.service.orders;
 
+import com.web.bookstore.dto.orderDTO.StaticOrderDto;
 import com.web.bookstore.dto.orderDTO.ordersDTO.OrdersCreateDTO;
 import com.web.bookstore.dto.orderDTO.ordersDTO.OrdersDTO;
 import com.web.bookstore.entity.user.User;
@@ -17,4 +18,6 @@ public interface OrdersService {
     OrdersDTO create(OrdersCreateDTO ordersCreateDTO);
     OrdersDTO update(Integer id,String status);
     Page<OrdersDTO> getStatus(Pageable pageable,String status);
+    long count();
+    public StaticOrderDto staticMonth(String month, String year);
 }

@@ -19,7 +19,11 @@ import org.springframework.http.HttpStatus;
 public class UserController {
     @Autowired
     private  UserService userService;
-
+    @GetMapping("/count")
+    public ResponseEntity<Long>count() {
+       Long count= userService.count();
+        return new ResponseEntity<>(count, HttpStatus.OK);
+    }
 
     @PreAuthorize("permitAll()")
     @PostMapping("/register")

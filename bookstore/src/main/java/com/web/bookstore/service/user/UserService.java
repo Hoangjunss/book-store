@@ -19,4 +19,5 @@ public interface UserService {
     Page<UserDTO> findByName(String name,Pageable pageable);
     void lock(Integer integer);
     UserDTO updateUser(UserDTO userDTO);
+    long count();
 }
