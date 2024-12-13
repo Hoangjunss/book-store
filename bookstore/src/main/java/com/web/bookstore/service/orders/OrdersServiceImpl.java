@@ -201,6 +201,8 @@ orders.setFee(ordersCreateDTO.getFee());
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         StaticOrderDto staticOrderDto =new StaticOrderDto();
+        staticOrderDto.setTotalPrice(totalRevenue);
+        staticOrderDto.setTotalQuantity(totalQuantity);
         return  staticOrderDto;
     }
 
