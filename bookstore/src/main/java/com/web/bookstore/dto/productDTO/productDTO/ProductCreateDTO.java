@@ -21,7 +21,6 @@ public class ProductCreateDTO {
     private MultipartFile image;
     private LocalDate datePublic;
     private String size;
-    private Integer supplyId;
     private Boolean status;
     private Integer quantity;
     private Double price;
