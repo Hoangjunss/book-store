@@ -4,6 +4,7 @@ import com.web.bookstore.dto.orderDTO.orderdetailDTO.OrderDetailDTO;
 import com.web.bookstore.dto.orderDTO.ordersDTO.OrdersCreateDTO;
 import com.web.bookstore.dto.orderDTO.ordersDTO.OrdersDTO;
 import com.web.bookstore.dto.orderDTO.ordersDTO.OrdersUpdateDTO;
+import com.web.bookstore.dto.otherDTO.addressDTO.AddressDTO;
 import com.web.bookstore.entity.order.Orders;
 import com.web.bookstore.entity.other.Address;
 import com.web.bookstore.entity.user.User;
@@ -19,6 +20,8 @@ public class OrdersMapper {
 
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private AddressMapper addressMapper;
 
     public Orders convertOrdersCreateDTOToOrders(OrdersCreateDTO ordersCreateDTO) {
         Orders orders = modelMapper.map(ordersCreateDTO, Orders.class);
@@ -37,6 +40,7 @@ public class OrdersMapper {
        ordersDTO.setUsername(orders.getUser().getUsername());
        ordersDTO.setOrderStatus(orders.getOrderStatus().name());
        ordersDTO.setPaymentStatus(orders.getPaymentStatus().name());
+        AddressDTO addressDTO=addressMapper.convertAddressToAddressDTO(orders.getAddress());
        return ordersDTO;
     }
 
