@@ -77,7 +77,7 @@ public class ProductSaleServiceImpl implements ProductSaleService{
     public ProductSaleDTO updateProductSale(ProductSaleUpdateDTO updateDTO) {
         ProductSale existingProductSale = productSaleRepository.findById(updateDTO.getId())
                 .orElseThrow(() -> new RuntimeException("ProductSale not found"));
-Product product= productRepository.findById(updateDTO.getProductId()).orElseThrow();
+Product product= existingProductSale.getProduct();
 
         Warehouse warehouse =warehouseRepository.findByProduct(product);
         int quantityDifference = updateDTO.getQuantity() - existingProductSale.getQuantity();
