@@ -179,7 +179,7 @@ orders.setFee(ordersCreateDTO.getFee());
     public StaticOrderDto staticMonth(String month, String year) {
 
         // Lấy danh sách các đơn hàng theo trạng thái (ví dụ: hoàn tất)
-        List<Orders> orders = orderRepository.findAllByOrderStatus(OrderStatus.SUCCESS);
+        List<Orders> orders = orderRepository.findAllByOrderStatus(OrderStatus.ACCESS);
 
         // Lọc đơn hàng theo tháng và năm
         List<Orders> filteredOrders = orders.stream()
