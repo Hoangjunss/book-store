@@ -20,7 +20,7 @@ public class ProductDTO {
     private String image;
     private LocalDate datePublic;
     private String size;
-    private String supply;
+
     private Boolean status;
     private Integer quantity;
     private Double price;
