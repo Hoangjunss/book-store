@@ -48,9 +48,13 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Page<ProductDTO> searchProducts(String name, String author, Integer categoryId,
                                            Double minPrice, Double maxPrice, Pageable pageable) {
-        Specification<Product> specification = Specification.where((root, query, criteriaBuilder) ->
-                criteriaBuilder.equal(root.get("status"), true)
-        );
+        Specification<Product> specification = Specification.where((root, query, criteriaBuilder) -> {
+            // Điều kiện mặc định: status = true và quantity > 0
+            return criteriaBuilder.and(
+                    criteriaBuilder.equal(root.get("status"), true),
+                    criteriaBuilder.greaterThan(root.get("quantity"), 0)
+            );
+        });
 
         if (name != null) {
             specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.like(root.get("name"), "%" + name + "%"));
