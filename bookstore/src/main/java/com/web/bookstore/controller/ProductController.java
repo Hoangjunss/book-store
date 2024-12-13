@@ -59,17 +59,7 @@ public class ProductController {
 
         return ResponseEntity.ok(products);
     }
-    @GetMapping("/supply")
-    public ResponseEntity<Page<ProductDTO>> getAllProductsSupply(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam Integer id) {
 
-        Pageable pageable = PageRequest.of(page, size);
-        Page<ProductDTO> products = productService.getAllSupply(pageable,id);
-
-        return ResponseEntity.ok(products);
-    }
     @GetMapping("/category")
     public ResponseEntity<Page<ProductDTO>> getAllProductsCategory(
             @RequestParam(defaultValue = "0") int page,

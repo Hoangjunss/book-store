@@ -83,14 +83,14 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDTO createProduct(ProductCreateDTO productDTO) {
         Image image=imageService.saveImage(productDTO.getImage());
-        Supply supply=supplyMapper.conventSupplyDTOToSupply(supplyService.findById(productDTO.getSupplyId()));
+
         Category category= categoryRepository.findById(productDTO.getCategoryId()).orElseThrow();
 
         Product product=productMapper.conventProductCreateDTOToProduct(productDTO);
         product.setId(getGenerationId());
         product.setCategory(category);
         product.setImage(image);
-        product.setSupply(supply);
+
 
         ProductDTO productDTO1= productMapper.conventProductToProductDTO(productRepository.save(product));
         String productKey = RedisConstant.PRODUCT + productDTO1.getId();
@@ -113,10 +113,7 @@ public class ProductServiceImpl implements ProductService {
         }
 
         // Update Supply if changed
-        if (!existingProduct.getSupply().getId().equals(productDTO.getSupplyId())) {
-            Supply newSupply=supplyMapper.conventSupplyDTOToSupply(supplyService.findById(productDTO.getSupplyId()));
-            existingProduct.setSupply(newSupply);
-        }
+
 
         // Update Image if provided
         if (productDTO.getImage() != null && !productDTO.getImage().isEmpty()) {
@@ -212,23 +209,6 @@ public class ProductServiceImpl implements ProductService {
         return products.map(productMapper::conventProductToProductDTO);
     }
 
-    @Override
-    public Page<ProductDTO> getAllSupply(Pageable pageable, Integer integer) {
-        Supply supply = supplyMapper.conventSupplyDTOToSupply(supplyService.findById(integer));
-
-
-            // Retrieve paginated Product entities from the database
-            Page<Product> products = productRepository.findAllBySupply(pageable, supply);
-
-            // Map each Product entity to ProductDTO
-            Page<ProductDTO> productDTOPage = products.map(productMapper::conventProductToProductDTO);
-
-            // Store the retrieved ProductDTOs in Redis
-
-
-            return productDTOPage;
-
-    }
 
     public Integer getGenerationId() {
         UUID uuid = UUID.randomUUID();

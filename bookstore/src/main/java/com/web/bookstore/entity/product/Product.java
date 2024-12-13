@@ -28,9 +28,7 @@ public class Product {
     private Image image;
 
     private String size;
-    @ManyToOne
-    @JoinColumn
-    private Supply supply;
+
     private Boolean status;
     private Integer quantity;
     private Double price;

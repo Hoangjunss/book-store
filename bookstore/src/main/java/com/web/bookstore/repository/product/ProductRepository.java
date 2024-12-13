@@ -10,6 +10,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface ProductRepository extends JpaRepository<Product,Integer>, JpaSpecificationExecutor<Product> {
-    Page<Product> findAllBySupply(Pageable pageable,Supply supply);
+
     Page<Product>findAllByCategory(Pageable pageable, Category category);
 }
