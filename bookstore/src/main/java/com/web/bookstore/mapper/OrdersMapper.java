@@ -40,6 +40,8 @@ public class OrdersMapper {
        ordersDTO.setUsername(orders.getUser().getUsername());
        ordersDTO.setOrderStatus(orders.getOrderStatus().name());
        ordersDTO.setPaymentStatus(orders.getPaymentStatus().name());
+       ordersDTO.setFee(orders.getFee());
+       ordersDTO.setDate(orders.getDate());
         AddressDTO addressDTO=addressMapper.convertAddressToAddressDTO(orders.getAddress());
        return ordersDTO;
     }

@@ -32,6 +32,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -129,6 +130,7 @@ public class OrdersServiceImpl implements OrdersService{
         orders.setTotalPrice(totalPrice);
         orders.setAddress(address);
         orders.setId(getGenerationId());
+        orders.setDate(LocalDateTime.now());
 
         orders.setOrderStatus(OrderStatus.valueOf(ordersCreateDTO.getOrderStatus()));
         orders.setPaymentStatus(Payment.valueOf(ordersCreateDTO.getPaymentStatus()));
@@ -143,7 +145,9 @@ public class OrdersServiceImpl implements OrdersService{
     public OrdersDTO update(Integer id, String status) {
         Orders orders=orderRepository.findById(id).orElseThrow();
         orders.setOrderStatus(OrderStatus.valueOf(status));
+        orders.setDate(LocalDateTime.now());
         Orders ordersSave=orderRepository.save(orders);
+
         List<OrderDetailDTO> orderDetailDTOS=orderDetailsService.findAllByOrder(ordersSave.getId());
         return ordersMapper.convertOrdersToOrdersDTO(ordersSave,orderDetailDTOS);
     }
