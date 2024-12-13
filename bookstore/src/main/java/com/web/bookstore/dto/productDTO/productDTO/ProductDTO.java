@@ -17,6 +17,7 @@ public class ProductDTO {
     private String author;
     private Integer page;
     private String category;
+    private Integer categoryId;
     private String image;
     private LocalDate datePublic;
     private String size;
