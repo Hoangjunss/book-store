@@ -26,8 +26,13 @@ public class AddressMapper {
     }
 
     public AddressDTO convertAddressToAddressDTO(Address address) {
+        if (address == null) {
+            return null;  // hoặc: new AddressDTO();
+        }
         return modelMapper.map(address, AddressDTO.class);
     }
+
+
 
     public List<AddressDTO> convertAddressListToAddressDTOList(List<Address> addresses) {
         return addresses.stream()

@@ -28,9 +28,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -155,21 +157,36 @@ orders.setFee(ordersCreateDTO.getFee());
 
     @Override
     public Page<OrdersDTO> getStatus(Pageable pageable, String status) {
-        // Chuyển đổi chuỗi thành OrderStatus
-        OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase());
 
-        // Lấy danh sách Orders theo trạng thái và phân trang
+        OrderStatus orderStatus;
+        try {
+            orderStatus = OrderStatus.valueOf(status.trim().toUpperCase());
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid order status");
+        }
+
         Page<Orders> ordersPage = orderRepository.findByOrderStatus(orderStatus, pageable);
-
-        // Chuyển đổi mỗi Orders thành OrdersDTO và bao gồm danh sách OrderDetailDTO
         return ordersPage.map(order -> {
-            // Lấy danh sách OrderDetailDTO cho từng đơn hàng
-            List<OrderDetailDTO> orderDetailDTOS = orderDetailsService.findAllByOrder(order.getId());
+            try {
+                log.info("Processing order id = {}", order.getId());
 
-            // Chuyển đổi Orders sang OrdersDTO, và set OrderDetailDTOS
-            return ordersMapper.convertOrdersToOrdersDTO(order, orderDetailDTOS);
+                List<OrderDetailDTO> orderDetailDTOS =
+                        orderDetailsService.findAllByOrder(order.getId());
+
+                log.info("Order {} has {} details",
+                        order.getId(),
+                        orderDetailDTOS != null ? orderDetailDTOS.size() : 0);
+
+                return ordersMapper.convertOrdersToOrdersDTO(order, orderDetailDTOS);
+
+            } catch (Exception e) {
+                log.error("ERROR at order id = " + order.getId(), e);
+                return null;
+            }
         });
+
     }
+
 
     @Override
     public long count() {
